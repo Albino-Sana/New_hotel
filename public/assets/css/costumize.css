@@ -33,3 +33,65 @@ canvas.chart-canvas {
     border-radius: 0.375rem;
     opacity: 0.5;
 }
+    /* Cores personalizadas */
+.bg-gradient-light-violet {
+    background: linear-gradient(135deg, #8a2be2 0%, #9370db 100%) !important;
+}
+
+.bg-soft-violet {
+    background-color: #b19cd9 !important;
+}
+
+.text-violet {
+    color: #8a2be2 !important;
+}
+
+.btn-violet {
+    background-color: #8a2be2;
+    color: white;
+    border-color: #8a2be2;
+}
+
+.btn-violet:hover {
+    background-color: #7b26d1;
+    border-color: #7b26d1;
+    color: white;
+}
+
+.btn-outline-violet {
+    color: #8a2be2;
+    border-color: #8a2be2;
+}
+
+.btn-outline-violet:hover {
+    background-color: #8a2be2;
+    color: white;
+}
+
+.bg-violet {
+    background-color: #8a2be2 !important;
+}
+
+/* Estilo do ícone do usuário */
+.user-icon-container {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.user-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}

@@ -1,11 +1,14 @@
+@php
+$tipoUser = Auth::user()->tipo ?? null;
+@endphp
 <div class="min-height-300 bg-dark position-absolute w-100"></div>
 
 <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
   <div class="sidenav-header">
     <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
     <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html " target="_blank">
-            <img src="{{ asset('assets/img/dat-sys-3D.png') }}" width="80px" height="100px" class="navbar-brand-img h-100" alt="main_logo">
-        </a>
+      <img src="{{ asset('assets/img/dat-sys-3D.png') }}" width="80px" height="100px" class="navbar-brand-img h-100" alt="main_logo">
+    </a>
   </div>
 
   <hr class="horizontal dark mt-0">
@@ -20,7 +23,7 @@
           <span class="nav-link-text ms-1">Dashboard</span>
         </a>
       </li>
-
+      @if ($tipoUser === 'Administrador')
       <li class="nav-item">
         <a class="nav-link" href="{{ route('funcionarios.index') }}">
           <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -58,6 +61,8 @@
           </a>
         </x-slot>
       </x-dropdown>
+      
+      @endif
 
       <li class="nav-item">
         <a class="nav-link" href="{{ route('reservas.index') }}">
@@ -93,7 +98,7 @@
           <span class="nav-link-text ms-1">Hóspedes</span>
         </a>
       </li>
-
+      @if ($tipoUser === 'Administrador')
       <li class="nav-item mt-3">
         <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Serviços Extras</h6>
       </li>
@@ -119,7 +124,7 @@
       <li class="nav-item mt-3">
         <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Pagamentos e Fatura</h6>
       </li>
-
+      @endif
     </ul>
   </div>
 </aside>

@@ -26,7 +26,9 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
+            'tipo' => 'required|in:Administrador,Recepcionista,Balconista,Gerente de Quarto',
         ]);
+        
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -37,6 +39,7 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'tipo' => $request->tipo,
             ]);
 
             return redirect()->route('usuarios.index')->with('success', 'Usuário criado com sucesso!');
@@ -54,11 +57,11 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $usuario = User::findOrFail($id);
-
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email,' . $id,
             'password' => 'nullable|string|min:6|confirmed',
+            'tipo' => 'required|in:Administrador,Recepcionista,Balconista,Gerente de Quarto',
         ]);
 
         if ($validator->fails()) {
@@ -71,6 +74,7 @@ class UserController extends Controller
             if ($request->filled('password')) {
                 $usuario->password = Hash::make($request->password);
             }
+            $usuario->tipo = $request->tipo;
             $usuario->save();
 
             return redirect()->route('usuarios.index')->with('success', 'Usuário atualizado com sucesso!');

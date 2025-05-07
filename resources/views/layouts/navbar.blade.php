@@ -3,7 +3,9 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
+@php
+    $tipoUser = Auth::user()->tipo ?? null;
+@endphp
 <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
   <div class="container-fluid py-1 px-3">
     <nav aria-label="breadcrumb">
@@ -22,7 +24,7 @@
       </div>
       <ul class="navbar-nav  justify-content-end">
 
-
+    
         <li class="nav-item d-flex align-items-center">
           <div class="dropdown">
             <a href="javascript:;" class="nav-link text-white font-weight-bold px-0 d-flex align-items-center" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -38,6 +40,7 @@
                 </a>
               </li>
 
+              @if ($tipoUser === 'Administrador')
               <li>
                 <a class="dropdown-item" href="{{ route('usuarios.index') }}">
                  Perfil
@@ -49,7 +52,8 @@
                 <a class="dropdown-item" href="{{ route('hotel.config') }}">
                 Configurações</a>
               </li>
-              
+              @endif
+
               <li>
                 <hr class="dropdown-divider">
               </li>

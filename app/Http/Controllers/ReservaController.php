@@ -6,11 +6,13 @@ use App\Models\Reserva;
 use App\Models\Quarto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ReservaController extends Controller
 {
     public function index()
     {
+        
         $reservas = Reserva::with('quarto')->orderBy('data_entrada', 'desc')->get();
         $quartos = Quarto::where('status', 'disponivel')->get();
         return view('reservas.index', compact('reservas', 'quartos'));
