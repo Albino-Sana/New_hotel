@@ -7,6 +7,11 @@ use App\Models\Quarto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\NotificarTerceiroDia;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificarQuartoDia;
+use App\Mail\NotificarReservaEmail;
+
 
 class ReservaController extends Controller
 {

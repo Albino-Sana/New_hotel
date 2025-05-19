@@ -22,6 +22,22 @@ class Quarto extends Model
         'descricao',
     ];
 
+    public function checkin()
+{
+    return $this->hasOne(Checkin::class)->where('status', 'Hospedado');
+}
+public function reserva()
+{
+    return $this->hasOne(Reserva::class, 'quarto_id', 'id');
+}
+public function hospede()
+{
+    return $this->hasOne(Hospede::class, 'quarto_id')->latest(); 
+}
+
+
+
+
     public function tipo()
     {
         return $this->belongsTo(TipoQuarto::class, 'tipo_quarto_id');

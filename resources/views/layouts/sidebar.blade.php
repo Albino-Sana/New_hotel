@@ -61,7 +61,7 @@ $tipoUser = Auth::user()->tipo ?? null;
           </a>
         </x-slot>
       </x-dropdown>
-      
+
       @endif
 
       <li class="nav-item">
@@ -73,40 +73,29 @@ $tipoUser = Auth::user()->tipo ?? null;
         </a>
       </li>
 
-      <li class="nav-item mt-3">
-        <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Check-in e check-out</h6>
-      </li>
-
       <li class="nav-item">
         <a class="nav-link" href="{{ route('checkins.index') }}">
           <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="ni ni-calendar-grid-58 text-dark text-sm opacity-10"></i>
+            <i class="fas fa-door-open text-dark text-sm opacity-10"></i>
           </div>
           <span class="nav-link-text ms-1">Check-in e check-out</span>
         </a>
       </li>
 
-      <li class="nav-item mt-3">
-        <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Hospedagem</h6>
-      </li>
-
       <li class="nav-item">
         <a class="nav-link" href="{{ route('hospedes.index') }}">
           <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="ni ni-building text-dark text-sm opacity-10"></i>
+            <i class="fas fa-users text-dark text-sm opacity-10"></i>
           </div>
           <span class="nav-link-text ms-1">Hóspedes</span>
         </a>
       </li>
-      @if ($tipoUser === 'Administrador')
-      <li class="nav-item mt-3">
-        <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Serviços Extras</h6>
-      </li>
 
+      @if ($tipoUser === 'Administrador')
       <li class="nav-item">
         <a class="nav-link" href="{{ route('servicos_extras.index') }}">
           <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="ni ni-single-copy-04 text-dark text-sm opacity-10"></i>
+            <i class="fas fa-concierge-bell text-dark text-sm opacity-10"></i>
           </div>
           <span class="nav-link-text ms-1">Serviços</span>
         </a>
@@ -115,16 +104,59 @@ $tipoUser = Auth::user()->tipo ?? null;
       <li class="nav-item">
         <a class="nav-link" href="../pages/sign-up.html">
           <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="ni ni-collection text-dark text-sm opacity-10"></i>
+            <i class="fas fa-credit-card text-dark text-sm opacity-10"></i>
           </div>
-          <span class="nav-link-text ms-1">Sign Up</span>
+          <span class="nav-link-text ms-1">Pagamentos</span>
         </a>
       </li>
 
-      <li class="nav-item mt-3">
-        <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Pagamentos e Fatura</h6>
-      </li>
+      <x-dropdown align="right" width="48">
+        <x-slot name="trigger">
+          <a class="nav-link d-flex align-items-center" href="#" role="button">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-chart-line text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Relatório</span>
+            <i class="fas fa-caret-down ms-2"></i>
+          </a>
+        </x-slot>
+        <x-slot name="content">
+          <a href="{{ route('relatorios.ocupacao') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
+            Ocupação de Quartos
+          </a>
+          <a href="{{ route('relatorios.reservas-cancelamentos') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
+            Cancelamento de Reservas
+          </a>
+          <a href="{{ route('relatorios.faturamento') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
+            Faturamento
+          </a>
+          <a href="{{ route('relatorios.servicos-extras') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
+            Serviços extras vendidos
+          </a>
+        </x-slot>
+      </x-dropdown>
       @endif
+
+      <x-dropdown align="right" width="48">
+        <x-slot name="trigger">
+          <a class="nav-link d-flex align-items-center" href="#" role="button">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="fas fa-cash-register text-dark text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Aceder POS</span>
+            <i class="fas fa-caret-down ms-2"></i>
+          </a>
+        </x-slot>
+        <x-slot name="content">
+          <a href="{{ route('PostoControle.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
+            POS1
+          </a>
+          <a href="{{ route('pos2') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
+            POS2
+          </a>
+        </x-slot>
+      </x-dropdown>
+
     </ul>
   </div>
 </aside>

@@ -59,7 +59,7 @@
                                             </td>
                                             <td>
                                                 <a href="{{ route('quartos.index') }}">
-                                                {{ $reserva->quarto->numero }}
+                                                    {{ $reserva->quarto->numero }}
                                                 </a>
                                             </td>
                                             <td class="align-middle text-center">
@@ -174,6 +174,11 @@
                                                                             </option>
                                                                             @endforeach
                                                                         </select>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label><i class="fas fa-users me-1 text-secondary"></i>Número de Pessoas</label>
+                                                                        <input type="number" class="form-control" name="numero_pessoas" value="{{ $reserva->numero_pessoas }}" min="1" required>
                                                                     </div>
 
                                                                     <div class="col-md-3 mb-3">
@@ -369,6 +374,7 @@
 
     <!--   Core JS Files   -->
     @include('components.js')
+ 
 
 </body>
 

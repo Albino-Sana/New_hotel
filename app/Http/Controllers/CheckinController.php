@@ -36,81 +36,77 @@ class CheckinController extends Controller
     }
 
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'reserva_id' => 'required|exists:reservas,id',
-            'quarto_id' => 'required|exists:quartos,id',
-            'data_entrada' => 'required|date',
-            'data_saida' => 'required|date|after_or_equal:data_entrada',
-            'num_pessoas' => 'required|integer|min:1',
+public function store(Request $request)
+{
+    $request->validate([
+        'reserva_id' => 'required|exists:reservas,id',
+        'quarto_id' => 'required|exists:quartos,id',
+        'numero_quarto' => 'required|string|max:255',
+        'data_entrada' => 'required|date',
+        'data_saida' => 'required|date|after_or_equal:data_entrada',
+        'num_pessoas' => 'required|integer|min:1',
+    ]);
+
+    try {
+        DB::beginTransaction();
+
+        $checkin = Checkin::create([
+            'reserva_id' => $request->reserva_id,
+            'quarto_id' => $request->quarto_id,
+            'numero_quarto' => $request->numero_quarto, // campo incluído
+            'data_entrada' => $request->data_entrada,
+            'data_saida' => $request->data_saida,
+            'num_pessoas' => $request->num_pessoas,
+            'status' => 'hospedado',
         ]);
 
-        try {
-            DB::beginTransaction();
+        Quarto::where('id', $request->quarto_id)->update(['status' => 'ocupado']);
+        Reserva::where('id', $request->reserva_id)->update(['status' => 'hospedado']);
 
-            // Cria o check-in
-            $checkin = Checkin::create([
-                'reserva_id' => $request->reserva_id,
-                'quarto_id' => $request->quarto_id,
-                'data_entrada' => $request->data_entrada,
-                'data_saida' => $request->data_saida,
-                'num_pessoas' => $request->num_pessoas,
-                'status' => 'hospedado',
-            ]);
+        DB::commit();
 
-            // Atualiza status do quarto para 'ocupado'
-            Quarto::where('id', $request->quarto_id)->update(['status' => 'ocupado']);
-
-            // Atualiza status da reserva para 'hospedado'
-            Reserva::where('id', $request->reserva_id)->update(['status' => 'hospedado']);
-
-            DB::commit();
-
-            return redirect()->back()->with('success', 'Check-in realizado com sucesso!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Erro ao salvar check-in: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('success', 'Check-in realizado com sucesso!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Erro ao salvar check-in: ' . $e->getMessage());
     }
+}
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'data_entrada' => 'required|date',
-            'data_saida' => 'required|date|after_or_equal:data_entrada',
-            'num_pessoas' => 'required|integer|min:1',
-            'status' => 'required|string',
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'data_entrada' => 'required|date',
+        'data_saida' => 'required|date|after_or_equal:data_entrada',
+        'num_pessoas' => 'required|integer|min:1',
+        'numero_quarto' => 'required|string|max:255',
+        'status' => 'required|string',
+    ]);
+
+    try {
+        DB::beginTransaction();
+
+        $checkin = Checkin::findOrFail($id);
+        $checkin->update([
+            'data_entrada' => $request->data_entrada,
+            'data_saida' => $request->data_saida,
+            'num_pessoas' => $request->num_pessoas,
+            'numero_quarto' => $request->numero_quarto, // campo incluído
+            'status' => $request->status,
         ]);
 
-        try {
-            DB::beginTransaction();
+        $quartoStatus = $request->status === 'hospedado' ? 'ocupado' : 'disponível';
+        Quarto::where('id', $checkin->quarto_id)->update(['status' => $quartoStatus]);
+        Reserva::where('id', $checkin->reserva_id)->update(['status' => $request->status]);
 
-            $checkin = Checkin::findOrFail($id);
-            $checkin->update([
-                'data_entrada' => $request->data_entrada,
-                'data_saida' => $request->data_saida,
-                'num_pessoas' => $request->num_pessoas,
-                'status' => $request->status,
-            ]);
+        DB::commit();
 
-            // Atualiza o status do quarto com base no status do check-in
-            $quartoStatus = $request->status === 'hospedado' ? 'ocupado' : 'disponível';
-            Quarto::where('id', $checkin->quarto_id)->update(['status' => $quartoStatus]);
-
-            // Atualiza status da reserva se necessário
-            Reserva::where('id', $checkin->reserva_id)->update(['status' => $request->status]);
-
-            DB::commit();
-
-            return redirect()->back()->with('success', 'Check-in atualizado com sucesso!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Erro ao atualizar check-in: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('success', 'Check-in atualizado com sucesso!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Erro ao atualizar check-in: ' . $e->getMessage());
     }
-
-
+}
 
     public function dadosReserva($id)
     {

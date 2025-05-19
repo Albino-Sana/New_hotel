@@ -15,6 +15,9 @@ class Checkout extends Model
         'valor_total',
     ];
 
+    protected $dates = ['data_checkout'];
+
+
     public function checkin()
     {
         return $this->belongsTo(Checkin::class);

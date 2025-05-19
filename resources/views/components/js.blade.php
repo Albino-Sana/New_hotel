@@ -3,6 +3,7 @@
 <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
 <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
 <script src="../assets/js/plugins/chartjs.min.js"></script>
+
 <!-- jQuery (obrigatório para Select2) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -21,10 +22,11 @@
 <script src="  https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="//unpkg.com/alpinejs" defer></script>
 
-<!-- DataTables -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
-<script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
+<!-- DataTables PT-BR -->
+<script src="https://cdn.datatables.net/plug-ins/1.11.5/i18n/pt-BR.json"></script>
 
 
 <script>
@@ -51,35 +53,9 @@
 <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
 <script src="../assets/js/argon-dashboard.min.js?v=2.1.0"></script>
 
-<!-- Bootstrap JS com Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-@if (session('success'))
-<script>
-  Swal.fire({
-    icon: 'success',
-    title: 'Sucesso!',
-    text: '{{ session('success') }}',
-    timer: 3000,
-    showConfirmButton: false
-  });
-</script>
-@endif
-
-@if (session('error'))
-<script>
-  Swal.fire({
-    icon: 'error',
-    title: 'Erro!',
-    text: '{{ session('error') }}',
-    timer: 4000,
-    confirmButtonText: 'Compreendi',
-    showConfirmButton: true
-
-});
-</script>
-@endif
 
 <script>
     @if(session('success'))
@@ -114,7 +90,6 @@
 </script>
 
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 document.querySelectorAll('.form-checkin').forEach(form => {
@@ -141,61 +116,8 @@ document.querySelectorAll('.form-checkin').forEach(form => {
 });
 </script>
 
-<script>
-  $(document).ready(function() {
-    try {
-        $('#Table').DataTable({
-            "language": {
-                "emptyTable": "Nenhum registro encontrado",
-                "info": "Mostrando _START_ até _END_ de _TOTAL_ registros",
-                "infoEmpty": "Mostrando 0 até 0 de 0 registros",
-                "infoFiltered": "(Filtrados de _MAX_ registros totais)",
-                "infoThousands": ".",
-                "lengthMenu": "Exibir _MENU_ registros por página",
-                "loadingRecords": "Carregando...",
-                "processing": "Processando...",
-                "zeroRecords": "Nenhum registro correspondente encontrado",
-                "search": "Pesquisar:",
-                "paginate": {
-                    "next": "Próximo",
-                    "previous": "Anterior",
-                    "first": "Primeiro",
-                    "last": "Último"
-                },
-                "aria": {
-                    "sortAscending": ": Ordem crescente",
-                    "sortDescending": ": Ordem decrescente"
-                },
-                "select": {
-                    "rows": {
-                        "_": "%d linhas selecionadas",
-                        "0": "Nenhuma linha selecionada",
-                        "1": "1 linha selecionada"
-                    }
-                }
-            },
-            "columnDefs": [
-                { 
-                    "targets": '_all', 
-                    "defaultContent": "-" // Valor padrão para células vazias
-                }
-            ],
-            "initComplete": function(settings, json) {
-                if (!json || json.data.length === 0) {
-                    console.log('Tabela vazia - sem dados para exibir');
-                }
-            },
-            "error": function(settings, techNote, message) {
-                console.error('Erro no DataTables:', message);
-                $('.dataTables_wrapper').find('.dataTables_error').hide();
-            }
-        });
-    } catch (e) {
-        console.error('Erro ao inicializar DataTables:', e);
-    }
-});
-</script>
 
+ 
 <!--preeche o valor a pagar ao selecionar o quarto do hospede-->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -259,7 +181,61 @@ document.querySelectorAll('.form-checkin').forEach(form => {
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 
+    <!-- JavaScript Libraries para todo conteudo do site -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/counterup/counterup.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="lib/tempusdominus/js/moment.min.js"></script>
+    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- Scripts globais -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr('.datepicker', {
+            dateFormat: 'd/m/Y', // Formato de exibição: 12/05/2025
+            locale: 'pt', // Localização para português
+            altInput: true, // Campo visível com formato d/m/Y
+            altFormat: 'd/m/Y', // Formato visível
+            allowInput: true, // Permite digitação manual
+            onChange: function(selectedDates, dateStr, instance) {
+                // Garante que o valor do input original seja Y-m-d para o form
+                instance.element.value = selectedDates[0]
+                    ? flatpickr.formatDate(selectedDates[0], 'Y-m-d')
+                    : '';
+            }
+        });
+    });
+</script>
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.min.js"></script>
 
 
 
+<!-- DataTables Inicialização -->
+<script>
+    var table = $('#Table').DataTable({
+      responsive: true,
+      language: {
+      url: "https://cdn.datatables.net/plug-ins/1.13.5/i18n/pt-BR.json",
+        paginate: {
+                first:    '«',
+                previous: '←',
+                next:     '→',
+                last:     '»'
+            }
+      }
+     
 
+    });
+</script>

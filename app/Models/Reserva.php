@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Quarto;
+use App\Models\Hospede;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reserva extends Model
 {
     protected $table = 'reservas'; // Nome da tabela no banco de dados
+    use SoftDeletes;
     protected $fillable = [
         'cliente_nome',
         'cliente_documento',
@@ -22,6 +25,8 @@ class Reserva extends Model
         'observacoes',
         'numero_pessoas', // Adicionando o campo numero_pessoas
     ];
+
+    protected $dates = ['data_entrada', 'data_saida', 'created_at', 'deleted_at'];
     public function hospede()
     {
         return $this->belongsTo(Hospede::class, 'hospede_id');

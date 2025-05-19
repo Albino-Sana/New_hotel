@@ -235,6 +235,7 @@
                                         <option value="{{ $reserva->id }}"
                                             data-cliente="{{ $reserva->cliente_nome }}"
                                             data-quarto="{{ $reserva->quarto_id }}"
+                                            data-quarto_num="{{ $reserva->quarto->numero }}"
                                             data-preco="{{ $reserva->valor_total }}"
                                             data-pessoas="{{ $reserva->numero_pessoas }}"
                                             data-entrada="{{ $reserva->data_entrada }}"
@@ -254,9 +255,14 @@
                                             <input type="text" id="cliente" class="form-control" readonly>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label>Quarto</label>
+                                            <label>Quarto ID</label>
                                             <input type="text" id="quarto_vis" class="form-control" readonly>
                                         </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Número do Quarto</label>
+                                            <input type="text" id="numero_quarto_vis" class="form-control" required>
+                                        </div>
+
                                         <div class="col-md-4 mb-3">
                                             <label>Preço</label>
                                             <input type="text" id="preco" class="form-control" readonly>
@@ -278,6 +284,7 @@
 
                                 <!-- Campos ocultos -->
                                 <input type="hidden" name="quarto_id" id="quarto">
+                                <input type="hidden" name="numero_quarto" id="numero_quarto_vis">
                                 <input type="hidden" name="data_entrada" id="entrada">
                                 <input type="hidden" name="data_saida" id="saida">
                                 <input type="hidden" name="num_pessoas" id="num_pessoas">
@@ -302,6 +309,7 @@
 
                     document.getElementById('cliente').value = option.dataset.cliente || '';
                     document.getElementById('quarto_vis').value = option.dataset.quarto || '';
+                    document.getElementById('numero_quarto_vis').value = option.dataset.quarto_num || '';
                     document.getElementById('preco').value = option.dataset.preco || '';
                     document.getElementById('pessoas').value = option.dataset.pessoas || '';
                     document.getElementById('entrada_vis').value = option.dataset.entrada || '';
@@ -312,6 +320,8 @@
                     document.getElementById('entrada').value = option.dataset.entrada || '';
                     document.getElementById('saida').value = option.dataset.saida || '';
                     document.getElementById('num_pessoas').value = option.dataset.pessoas || '';
+                    document.getElementById('numero_quarto_vis').value = option.dataset.quarto_num || '';
+
                 });
             </script>
 

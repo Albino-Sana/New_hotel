@@ -39,6 +39,7 @@ class QuartoController extends Controller
             'status' => 'required',
             'preco_noite' => 'required|numeric|min:0',
             'descricao' => 'nullable|string|max:255',
+            
         ]);
     
         // Verifica se já existe um quarto com o mesmo número e andar

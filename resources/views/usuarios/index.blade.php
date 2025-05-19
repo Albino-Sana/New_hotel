@@ -105,7 +105,7 @@
                     <form action="{{ route('usuarios.store') }}" method="POST">
                         @csrf
 
-                        <div class="modal-header bg-gradient-light-violet text-white">
+                        <div class="modal-header modal-header bg-gradient-primary text-white">
                             <h5 class="modal-title text-white">
                                 <i class="fas fa-user-plus me-2"></i>Adicionar Novo Utilizador
                             </h5>
@@ -182,7 +182,7 @@
                         @csrf
                         @method('PUT')
 
-                        <div class="modal-header bg-gradient-light-violet text-white">
+                        <div class="modal-header modal-header bg-gradient-primary text-white">
                             <h5 class="modal-title text-white">
                                 <i class="fas fa-user-edit me-2"></i>Editar Utilizador
                             </h5>

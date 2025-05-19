@@ -3,11 +3,8 @@
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Middleware\CheckUserTipo; // ← Importa o middleware que você criou
+use Illuminate\Console\Scheduling\Schedule;
+use App\Console\Commands\VerificarCheckins;
 
 class Kernel extends HttpKernel
 {
@@ -19,6 +16,17 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
     ];
 
+    protected function schedule(Schedule $schedule): void
+    {
+        $schedule->command(VerificarCheckins::class)->everyMinute();
+    }
+
+    protected function commands(): void
+    {
+        $this->load(__DIR__.'/Commands');
+        require base_path('routes/console.php');
+    }
+
     protected $middlewareGroups = [
         'web' => [
             \App\Http\Middleware\EncryptCookies::class,
@@ -28,7 +36,6 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
-
         'api' => [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
@@ -41,5 +48,4 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'tipo' => \App\Http\Middleware\CheckUserTipo::class,
     ];
-    
 }

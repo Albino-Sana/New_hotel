@@ -14,12 +14,14 @@ class Checkin extends Model
         'reserva_id',
         'quarto_id',
         'data_entrada',
+      'numero_quarto',  
         'data_saida',
         'num_pessoas',
         'status',
     ];
 
 
+    protected $dates = ['data_entrada', 'data_saida'];
     public function reserva()
     {
         return $this->belongsTo(Reserva::class);
@@ -44,5 +46,9 @@ class Checkin extends Model
     public function checkout()
     {
         return $this->hasOne(Checkout::class);
+    }
+    public function scopeOcupados($query)
+    {
+        return $query->where('status', 'ocupado');
     }
 }

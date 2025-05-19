@@ -10,6 +10,8 @@ class Hospede extends Model
     use HasFactory;
 
     protected $fillable = [
+    
+        'hospede_id',
         'nome',
         'email',
         'telefone',
@@ -19,21 +21,37 @@ class Hospede extends Model
         'quarto_id',
         'valor_a_pagar',
         'status',
-
     ];
+
+    protected $casts = [
+        'data_entrada' => 'date',
+        'data_saida' => 'date',
+    ];
+
     public function quarto()
     {
         return $this->belongsTo(Quarto::class);
     }
 
-    public function servicos()
+    public function reserva()
     {
-        return $this->belongsToMany(ServicoAdicional::class, 'hospede_servico');
+        return $this->hasOne(Reserva::class);
     }
 
     public function servicosAdicionais()
     {
-        return $this->belongsToMany(ServicoAdicional::class, 'hospede_servico')
-            ->withTimestamps();
+        return $this->belongsToMany(ServicoAdicional::class, 'hospede_servico')->withTimestamps();
+    }
+    public function checkin()
+    {
+        return $this->hasOne(Checkin::class);
+    }
+    public function estadias()
+    {
+        return $this->hasMany(Estadia::class);
+    }
+    public function checkoutHospede()
+    {
+        return $this->hasOne(CheckoutHospede::class);
     }
 }

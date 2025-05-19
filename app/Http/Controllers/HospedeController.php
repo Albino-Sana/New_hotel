@@ -2,34 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Hospede;
 use App\Models\Quarto;
+use App\Models\CheckoutHospede;
+use App\Models\ServicoAdicional;
+use App\Models\Estadia;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class HospedeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $busca = $request->input('busca');
 
-        $hospedes = Hospede::when($busca, function ($query, $busca) {
-            return $query->where('nome', 'like', "%{$busca}%")
-                ->orWhere('email', 'like', "%{$busca}%")
-                ->orWhere('documento', 'like', "%{$busca}%");
-        })
+        $hospedes = Hospede::with('quarto', 'checkoutHospede')
+            ->when($busca, function ($query, $busca) {
+                return $query->where('nome', 'like', "%{$busca}%")
+                    ->orWhere('email', 'like', "%{$busca}%")
+                    ->orWhere('documento', 'like', "%{$busca}%");
+            })
             ->orderByDesc('created_at')
             ->paginate(10);
 
-        $quartos = Quarto::where('status', 'Disponível')->get(); // ou todos se preferir
+        $quartos = Quarto::where('status', 'Disponível')->get();
+        $servicosAdicionais = ServicoAdicional::all();
 
-        return view('hospedes.index', compact('hospedes', 'busca', 'quartos'));
+        return view('hospedes.index', compact('hospedes', 'busca', 'quartos', 'servicosAdicionais'));
     }
-
 
     public function store(Request $request)
     {
@@ -42,21 +42,17 @@ class HospedeController extends Controller
             'data_saida' => 'required|date|after:data_entrada',
             'quarto_id' => 'required|exists:quartos,id',
         ]);
-    
+
         try {
-            // Buscar o quarto
             $quarto = Quarto::findOrFail($request->quarto_id);
-    
-            // Calcular número de noites
-            $entrada = \Carbon\Carbon::parse($request->data_entrada);
-            $saida = \Carbon\Carbon::parse($request->data_saida);
+
+            $entrada = Carbon::parse($request->data_entrada);
+            $saida = Carbon::parse($request->data_saida);
             $noites = $entrada->diffInDays($saida);
-    
-            // Calcular valor total
+
             $valorTotal = $noites * $quarto->preco_noite;
-    
-            // Criar o hóspede
-            Hospede::create([
+
+            $hospede = Hospede::create([
                 'nome' => $request->nome,
                 'email' => $request->email,
                 'telefone' => $request->telefone,
@@ -65,29 +61,29 @@ class HospedeController extends Controller
                 'data_saida' => $request->data_saida,
                 'quarto_id' => $request->quarto_id,
                 'valor_a_pagar' => $valorTotal,
+                'status' => 'Hospedado',
             ]);
 
-                  // Marca o quarto como "ocupado"
-                  $quarto = Quarto::find($request->quarto_id);
-                  $quarto->status = 'ocupado';
-                  $quarto->save();
-          
-    
+            Estadia::create([
+                'hospede_id' => $hospede->id,
+                'quarto_id' => $request->quarto_id,
+                'data_entrada' => $request->data_entrada,
+                'data_saida' => $request->data_saida,
+            ]);
+
+            $quarto->update(['status' => 'ocupado']);
+
             return redirect()->back()->with('success', 'Hóspede cadastrado com sucesso!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erro ao cadastrar hóspede: ' . $e->getMessage());
         }
     }
-    /**
-     * Show the form for creating a new resource.
-     */
 
     public function create()
     {
-        $quartos = Quarto::where('status', 'disponível')->get(); // ou todos os quartos
+        $quartos = Quarto::where('status', 'Disponível')->get();
         return view('hospedes.create', compact('quartos'));
     }
-
 
     public function update(Request $request, $id)
     {
@@ -99,19 +95,19 @@ class HospedeController extends Controller
             'data_entrada' => 'required|date',
             'data_saida' => 'required|date|after:data_entrada',
             'quarto_id' => 'required|exists:quartos,id',
+
         ]);
-    
+
         try {
             $hospede = Hospede::findOrFail($id);
-    
-            $entrada = \Carbon\Carbon::parse($request->data_entrada);
-            $saida = \Carbon\Carbon::parse($request->data_saida);
-            $dias = $entrada->diffInDays($saida);
-    
+
+            $entrada = Carbon::parse($request->data_entrada);
+            $saida = Carbon::parse($request->data_saida);
+            $noites = $entrada->diffInDays($saida);
+
             $quarto = Quarto::findOrFail($request->quarto_id);
-            $valorTotal = $dias * $quarto->preco_noite;
-    
-            // Atualizar o hóspede
+            $valorTotal = $noites * $quarto->preco_noite;
+
             $hospede->update([
                 'nome' => $request->nome,
                 'email' => $request->email,
@@ -121,52 +117,94 @@ class HospedeController extends Controller
                 'data_saida' => $request->data_saida,
                 'quarto_id' => $request->quarto_id,
                 'valor_a_pagar' => $valorTotal,
+                'status' => $hospede->status === 'finalizado' ? 'finalizado' : 'Hospedado',
             ]);
-    
+
+            $estadia = $hospede->estadias()->latest()->first();
+            if ($estadia) {
+                $estadia->update([
+                    'quarto_id' => $request->quarto_id,
+                    'data_entrada' => $request->data_entrada,
+                    'data_saida' => $request->data_saida,
+                ]);
+            } else {
+                Estadia::create([
+                    'hospede_id' => $hospede->id,
+                    'quarto_id' => $request->quarto_id,
+                    'data_entrada' => $request->data_entrada,
+                    'data_saida' => $request->data_saida,
+                ]);
+            }
+
+            $quarto->update(['status' => 'ocupado']);
+
             return redirect()->back()->with('success', 'Hóspede atualizado com sucesso!');
         } catch (\Exception $e) {
             return back()->with('error', 'Erro ao atualizar hóspede: ' . $e->getMessage());
         }
     }
-    
-    
-    
-    
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
 
     public function destroy($id)
     {
         try {
             $hospede = Hospede::findOrFail($id);
-    
-            // Libera o quarto se estiver associado
+
             if ($hospede->quarto) {
-                $hospede->quarto->status = 'Disponivel';
-                $hospede->quarto->save();
+                $hospede->quarto->update(['status' => 'Disponível']);
             }
-    
-            // Exclui o hóspede
+
             $hospede->delete();
-    
+
             return redirect()->route('hospedes.index')->with('success', 'Hóspede excluído e quarto liberado com sucesso!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Erro ao excluir hóspede!');
+            return back()->with('error', 'Erro ao excluir hóspede: ' . $e->getMessage());
         }
     }
-    
+
+    public function checkout(Request $request, $id)
+    {
+        $request->validate([
+            'servicos' => 'nullable|array',
+            'servicos.*' => 'exists:servicos_adicionais,id',
+        ]);
+
+        try {
+            $hospede = Hospede::with('quarto')->findOrFail($id);
+
+            if ($hospede->status === 'finalizado') {
+                return back()->with('error', 'Hóspede já realizou check-out.');
+            }
+
+            $valorHospedagem = $hospede->valor_a_pagar;
+            $valorServicos = 0;
+            $servicosNomes = [];
+
+            if ($request->has('servicos')) {
+                $servicos = ServicoAdicional::whereIn('id', $request->servicos)->get();
+                $valorServicos = $servicos->sum('preco');
+                $servicosNomes = $servicos->pluck('nome')->toArray();
+                $hospede->servicosAdicionais()->sync($request->servicos);
+            }
+
+            $valorTotal = $valorHospedagem + $valorServicos;
+
+            CheckoutHospede::create([
+                'hospede_id' => $hospede->id,
+                'data_checkout' => now(),
+                'valor_hospedagem' => $valorHospedagem,
+                'valor_servicos' => $valorServicos > 0 ? $valorServicos : null,
+                'valor_total' => $valorTotal,
+                'servicos_adicionais' => !empty($servicosNomes) ? $servicosNomes : null,
+            ]);
+
+            $hospede->update(['status' => 'finalizado']);
+            if ($hospede->quarto) {
+                $hospede->quarto->update(['status' => 'Disponível']);
+            }
+
+            return redirect()->back()->with('success', 'Check-out realizado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erro ao realizar check-out: ' . $e->getMessage());
+        }
+    }
 }
