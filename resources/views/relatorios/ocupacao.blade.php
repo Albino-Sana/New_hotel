@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,12 +10,13 @@
 
     @include('components.css')
 </head>
+
 <body class="g-sidenav-show bg-gray-100">
     @include('layouts.sidebar')
 
     <main class="main-content position-relative border-radius-lg">
         @php
-            $titulo = 'Relatório de Ocupação';
+        $titulo = 'Relatório de Ocupação';
         @endphp
         @include('layouts.navbar', ['titulo' => $titulo])
 
@@ -34,6 +36,7 @@
                                 <button type="button" class="btn btn-sm btn-outline-primary periodo-btn active" data-periodo="7dias">7 Dias</button>
                                 <button type="button" class="btn btn-sm btn-outline-primary periodo-btn" data-periodo="30dias">30 Dias</button>
                                 <button type="button" class="btn btn-sm btn-outline-primary periodo-btn" data-periodo="12meses">12 Meses</button>
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-pdf">Exportar PDF</button>
                             </div>
                         </div>
                         <div class="card-body p-3">
@@ -51,4 +54,5 @@
     @include('layouts.customise')
     @include('components.js')
 </body>
+
 </html>

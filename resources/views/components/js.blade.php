@@ -6,6 +6,8 @@
 
 <!-- jQuery (obrigatório para Select2) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 <!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -19,16 +21,13 @@
 <script src="../assets/js/core/bootstrap.min.js"></script>
 <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
 <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
-<script src="  https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="//unpkg.com/alpinejs" defer></script>
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
 <!-- DataTables PT-BR -->
 <script src="https://cdn.datatables.net/plug-ins/1.11.5/i18n/pt-BR.json"></script>
 
-
 <script>
   var win = navigator.platform.indexOf('Win') > -1;
   if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -39,64 +38,58 @@
   }
 </script>
 
-<script>
-  var win = navigator.platform.indexOf('Win') > -1;
-  if (win && document.querySelector('#sidenav-scrollbar')) {
-    var options = {
-      damping: '0.5'
-    }
-    Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-  }
-</script>
 <!-- Github buttons -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
 <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
 <script src="../assets/js/argon-dashboard.min.js?v=2.1.0"></script>
 
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
 <script>
-    @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Sucesso!',
-            text: '{{ session('success') }}',
-            confirmButtonText: 'Compreendi',
-            confirmButtonColor: '#3085d6',
-        });
-    @endif
+    document.addEventListener("DOMContentLoaded", function() {
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Sucesso!',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Compreendi'
+            });
+        @endif
 
-    @if(session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro!',
-            text: '{{ session('error') }}',
-            confirmButtonText: 'Compreendi',
-            confirmButtonColor: '#d33',
-        });
-    @endif
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: '{{ session('error') }}',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Compreendi'
+            });
+        @endif
 
-    @if($errors->any())
-        Swal.fire({
-            icon: 'warning',
-            title: 'Atenção!',
-            html: `{!! implode('<br>', $errors->all()) !!}`,
-            confirmButtonText: 'Compreendi',
-            confirmButtonColor: '#f39c12',
-        });
-    @endif
+        @if (session('warning'))
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                text: '{{ session('warning') }}',
+                confirmButtonColor: '#f0ad4e',
+                confirmButtonText: 'Compreendi'
+            });
+        @endif
+
+
+        @if ($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: '@foreach ($errors->all() as $error){{ $error }}@if (!$loop->last), @endif @endforeach',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Compreendi'
+            });
+        @endif
+    });
 </script>
-
-
 
 <script>
 document.querySelectorAll('.form-checkin').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        e.preventDefault(); // evita o envio imediato
-    });
-
     form.querySelector('button').addEventListener('click', function() {
         Swal.fire({
             title: 'Fazer Check-in?',
@@ -114,10 +107,9 @@ document.querySelectorAll('.form-checkin').forEach(form => {
         });
     });
 });
+
 </script>
 
-
- 
 <!--preeche o valor a pagar ao selecionar o quarto do hospede-->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -167,31 +159,19 @@ document.querySelectorAll('.form-checkin').forEach(form => {
     });
 </script>
 
-@if (session('error'))
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Acesso Negado',
-            text: '{{ session('error') }}',
-            confirmButtonText: 'Compreendi'
-        });
-    </script>
-@endif
-
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-
-    <!-- JavaScript Libraries para todo conteudo do site -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/wow/wow.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/waypoints/waypoints.min.js"></script>
-    <script src="lib/counterup/counterup.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="lib/tempusdominus/js/moment.min.js"></script>
-    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
-    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- JavaScript Libraries para todo conteudo do site -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="lib/wow/wow.min.js"></script>
+<script src="lib/easing/easing.min.js"></script>
+<script src="lib/waypoints/waypoints.min.js"></script>
+<script src="lib/counterup/counterup.min.js"></script>
+<script src="lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="lib/tempusdominus/js/moment.min.js"></script>
+<script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+<script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
 <!-- Scripts globais -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
@@ -213,14 +193,12 @@ document.querySelectorAll('.form-checkin').forEach(form => {
         });
     });
 </script>
-    <!-- Template Javascript -->
-    <script src="js/main.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Template Javascript -->
+<script src="js/main.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.min.js"></script>
-
-
 
 <!-- DataTables Inicialização -->
 <script>
@@ -235,7 +213,86 @@ document.querySelectorAll('.form-checkin').forEach(form => {
                 last:     '»'
             }
       }
-     
-
     });
+</script>
+
+<script>
+// Ativa todos os tooltips na página
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            trigger: 'hover focus'
+        });
+    });
+});
+</script>
+<script>
+    $(document).ready(function() {
+        // Desativa todos os avisos do DataTables
+        $.fn.dataTable.ext.errMode = 'none';
+
+        $('.table').DataTable({
+            select: true,
+            responsive: true,
+            ordering: false,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
+            },
+            lengthMenu: [
+                [5, 10, 25, -1],
+                [5, 10, 25, "Todos"]
+            ],
+        });
+    });
+</script>
+
+<!-- Confirmações de ações consolidadas -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Confirmação para exclusão, cancelamento e eliminação permanente
+    const actionButtons = {
+        '.btn-delete': {
+            title: 'Tem certeza?',
+            text: 'Esta ação não poderá ser desfeita!',
+            confirmText: 'Sim, excluir!',
+            confirmColor: '#d33',
+            cancelColor: '#6c757d'
+        },
+        '.btn-delete-permanent': {
+            title: 'Eliminar permanentemente?',
+            text: 'Esta ação não pode ser desfeita e removerá todos os dados da reserva!',
+            confirmText: 'Sim, eliminar!',
+            confirmColor: '#d33',
+            cancelColor: '#3085d6'
+        }
+    };
+
+    Object.keys(actionButtons).forEach(selector => {
+        document.querySelectorAll(selector).forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const { title, text, confirmText, confirmColor, cancelColor } = actionButtons[selector];
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: selector === '.btn-delete-permanent' ? 'error' : 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: confirmColor,
+                    cancelButtonColor: cancelColor,
+                    confirmButtonText: confirmText,
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = button.closest('form');
+                        if (form) {
+                            form.submit();
+                        }
+                    }
+                });
+            });
+        });
+    });
+});
 </script>

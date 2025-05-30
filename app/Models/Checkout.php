@@ -22,4 +22,8 @@ class Checkout extends Model
     {
         return $this->belongsTo(Checkin::class);
     }
+    public function checkoutHospedes()
+    {
+        return $this->hasMany(CheckoutHospede::class);
+    }
 }

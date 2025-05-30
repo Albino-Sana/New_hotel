@@ -24835,6 +24835,7 @@ hr.horizontal.gray-light {
 
 .navbar-vertical.bg-default .sidenav-header .navbar-brand {
   color: #fff;
+
 }
 
 .navbar-vertical.bg-default .sidenav-footer h6,
@@ -28255,4 +28256,10 @@ pre[class*=language-] {
 }
 .modal-backdrop.show {
     background-color: rgba(0, 0, 0, 0.2) !important; /* mais claro */
+}
+table.dataTable thead {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* borda mais suave */
+}
+table.dataTable tbody tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* borda mais suave */
 }

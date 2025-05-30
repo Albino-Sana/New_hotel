@@ -66,58 +66,60 @@
                                                 <button class="btn btn-link text-secondary text-xs mb-0" data-bs-toggle="modal" data-bs-target="#modalEditarCargo{{ $cargo->id }}">Editar</button>
                                                 <form action="{{ route('cargos.destroy', $cargo) }}" method="POST" style="display:inline">
                                                     @csrf @method('DELETE')
-                                                    <button type="submit" class="btn btn-link text-danger text-xs mb-0 border-0 bg-transparent" onclick="return confirm('Deseja excluir este cargo?')">Excluir</button>
+                                                    <button type="button" class="btn btn-link text-danger text-xs mb-0 border-0 bg-transparent btn-delete">
+                                                        Excluir
+                                                    </button>
                                                 </form>
                                             </td>
                                         </tr>
 
-                                   <!-- Modal Editar Cargo -->
-<div class="modal fade" id="modalEditarCargo{{ $cargo->id }}" tabindex="-1" aria-labelledby="modalEditarCargoLabel{{ $cargo->id }}" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form action="{{ route('cargos.update', $cargo) }}" method="POST">
-                @csrf
-                @method('PUT')
-                
-                <div class="modal-header bg-gradient-primary text-white">
-                    <h5 class="modal-title text-white">
-                        <i class="fas fa-user-tie me-2"></i>Editar Cargo
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                
-                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-                    <!-- Informações do Cargo -->
-                    <div class="card mb-3 shadow-sm">
-                        <div class="card-header bg-light">
-                            <strong><i class="fas fa-info-circle me-2 text-primary"></i>Informações do Cargo</strong>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label><i class="fas fa-signature me-1 text-secondary"></i>Nome do Cargo</label>
-                                <input type="text" name="nome" value="{{ $cargo->nome }}" class="form-control" required>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label><i class="fas fa-align-left me-1 text-secondary"></i>Descrição</label>
-                                <textarea name="descricao" class="form-control" rows="3" placeholder="Descreva o cargo...">{{ $cargo->descricao }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i>Cancelar
-                    </button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save me-1"></i>Salvar Alterações
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+                                        <!-- Modal Editar Cargo -->
+                                        <div class="modal fade" id="modalEditarCargo{{ $cargo->id }}" tabindex="-1" aria-labelledby="modalEditarCargoLabel{{ $cargo->id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <form action="{{ route('cargos.update', $cargo) }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+
+                                                        <div class="modal-header bg-gradient-primary text-white">
+                                                            <h5 class="modal-title text-white">
+                                                                <i class="fas fa-user-tie me-2"></i>Editar Cargo
+                                                            </h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                                        </div>
+
+                                                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                                                            <!-- Informações do Cargo -->
+                                                            <div class="card mb-3 shadow-sm">
+                                                                <div class="card-header bg-light">
+                                                                    <strong><i class="fas fa-info-circle me-2 text-primary"></i>Informações do Cargo</strong>
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <div class="mb-3">
+                                                                        <label><i class="fas fa-signature me-1 text-secondary"></i>Nome do Cargo</label>
+                                                                        <input type="text" name="nome" value="{{ $cargo->nome }}" class="form-control" required>
+                                                                    </div>
+
+                                                                    <div class="mb-3">
+                                                                        <label><i class="fas fa-align-left me-1 text-secondary"></i>Descrição</label>
+                                                                        <textarea name="descricao" class="form-control" rows="3" placeholder="Descreva o cargo...">{{ $cargo->descricao }}</textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                                <i class="fas fa-times me-1"></i>Cancelar
+                                                            </button>
+                                                            <button type="submit" class="btn btn-success">
+                                                                <i class="fas fa-save me-1"></i>Salvar Alterações
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                         @endforeach
                                     </tbody>
                                 </table>

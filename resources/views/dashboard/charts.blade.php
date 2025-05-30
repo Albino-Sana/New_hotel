@@ -1,14 +1,11 @@
-<!-- Apenas uma vez -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
     var ctx1 = document.getElementById("chart-line").getContext("2d");
     var chartLine;
 
     const mesesPTBR = {
-        'Jan': 'Jan', 'Feb': 'Fev', 'Mar': 'Mar', 'Apr': 'Abr', 'May': 'Mai',
-        'Jun': 'Jun', 'Jul': 'Jul', 'Aug': 'Ago', 'Sep': 'Set', 'Oct': 'Out',
-        'Nov': 'Nov', 'Dec': 'Dez'
+        'Jan': 'Janeiro', 'Feb': 'Fevereiro', 'Mar': 'Março', 'Apr': 'Abril', 'May': 'Maio',
+        'Jun': 'Junho', 'Jul': 'Julho', 'Aug': 'Agosto', 'Sep': 'Setembro', 'Oct': 'Outubro',
+        'Nov': 'Novembro', 'Dec': 'Dezembro'
     };
 
     function traduzirLabels(labels) {
@@ -25,6 +22,10 @@
         // Feedback visual
         document.getElementById('grafico-titulo').textContent = 'Carregando...';
         document.getElementById('variacao-texto').textContent = 'Carregando...';
+
+        // Forçar a altura do canvas antes de recriar o gráfico
+        const canvas = document.getElementById('chart-line');
+        canvas.height = 300; // Reaplica a altura inicial
 
         fetch(`/dashboard/dados-grafico?periodo=${periodo}`)
             .then(response => response.json())
@@ -120,12 +121,24 @@
             });
     }
 
+    // Função para baixar o PDF
+    function baixarPDF(periodo) {
+        const url = `/dashboard/relatorio-pdf?periodo=${periodo}`;
+        window.open(url, '_blank'); // Abre o PDF em uma nova aba ou baixa automaticamente, dependendo do backend
+    }
+
     document.querySelectorAll('.periodo-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             carregarDadosGrafico(this.dataset.periodo);
         });
+    });
+
+    // Adiciona evento ao botão de PDF
+    document.getElementById('btn-pdf').addEventListener('click', function () {
+        const activePeriodo = document.querySelector('.periodo-btn.active').dataset.periodo;
+        baixarPDF(activePeriodo);
     });
 
     document.addEventListener('DOMContentLoaded', function () {

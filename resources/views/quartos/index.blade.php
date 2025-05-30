@@ -90,10 +90,10 @@
                                 <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
                                     <div class="card card-hover h-100 shadow-sm">
                                         <div class="card-header p-3 pb-2 bg-gradient-{{ 
-                    $quarto->status == 'Disponível' ? 'success' : 
-                    ($quarto->status == 'Reservado' ? 'primary' : 
-                    ($quarto->status == 'Ocupado' ? 'danger' : 'secondary')) 
-                }} text-white border-radius-lg">
+                                                $quarto->status == 'Disponível' ? 'success' : 
+                                                ($quarto->status == 'Reservado' ? 'primary' : 
+                                                ($quarto->status == 'Ocupado' ? 'danger' : 'secondary')) 
+                                            }} text-white border-radius-lg">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <h6 class="mb-0 text-white">Quarto #{{ $quarto->numero }}</h6>
                                                 <span class="badge bg-white text-dark">{{ $quarto->andar }}º Andar</span>
@@ -104,17 +104,25 @@
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <span class="text-sm">{{ $quarto->tipo->nome }}</span>
                                                 <span class="badge badge-sm bg-gradient-{{ 
-                            $quarto->status == 'Disponível' ? 'success' : 
-                            ($quarto->status == 'Reservado' ? 'primary' : 
-                            ($quarto->status == 'Ocupado' ? 'danger' : 'secondary')) 
-                        }}">{{ $quarto->status }}</span>
+                                                        $quarto->status == 'Disponível' ? 'success' : 
+                                                        ($quarto->status == 'Reservado' ? 'primary' : 
+                                                        ($quarto->status == 'Ocupado' ? 'danger' : 'secondary')) 
+                                                    }}">{{ $quarto->status }}</span>
                                             </div>
 
                                             <hr class="horizontal dark my-2">
 
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <h5 class="mb-0">{{ number_format($quarto->preco_noite, 2, ',', '.') }} Kz</h5>
-                                                <span class="text-sm">/noite</span>
+                                                <span class="text-sm">
+                                                    @if($quarto->tipo_cobranca === 'por_hora')
+                                                    /hora
+                                                    @elseif($quarto->tipo_cobranca === 'por_noite')
+                                                    /noite
+                                                    @else
+                                                    /período
+                                                    @endif
+                                                </span>
                                             </div>
 
                                             <div class="mt-3">
@@ -130,9 +138,11 @@
 
                                                 <form action="{{ route('quartos.destroy', $quarto) }}" method="POST" class="d-inline">
                                                     @csrf @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger mb-0" onclick="return confirm('Tem certeza que deseja excluir este quarto?')">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger mb-0 btn-delete"
+                                                        data-url="{{ route('quartos.destroy', $quarto) }}">
                                                         <i class="fas fa-trash-alt me-1"></i> Excluir
                                                     </button>
+
                                                 </form>
                                             </div>
                                         </div>
@@ -253,6 +263,7 @@
                         <form action="{{ route('quartos.store') }}" method="POST">
                             @csrf
 
+
                             <div class="modal-header bg-gradient-primary text-white">
                                 <h5 class="modal-title text-white">
                                     <i class="fas fa-bed me-2"></i>Adicionar Novo Quarto
@@ -292,13 +303,24 @@
                                     <div class="card-body row">
                                         <div class="col-md-6 mb-3">
                                             <label><i class="fas fa-hotel me-1 text-secondary"></i>Tipo de Quarto</label>
-                                            <select class="form-control" name="tipo_quarto_id" required>
+                                            <select class="form-control @error('tipo_quarto_id') is-invalid @enderror"
+                                                name="tipo_quarto_id" id="tipo_quarto_id" required>
                                                 <option value="" disabled selected>Selecione o tipo</option>
                                                 @foreach($tipos as $tipo)
-                                                <option value="{{ $tipo->id }}">{{ $tipo->nome }}</option>
+                                                <option value="{{ $tipo->id }}"
+                                                    @if(old('tipo_quarto_id')==$tipo->id) selected @endif
+                                                    data-preco="{{ $tipo->preco }}"
+                                                    data-cobranca="{{ $tipo->tipo_cobranca }}">
+                                                    {{ $tipo->nome }}
+                                                </option>
                                                 @endforeach
                                             </select>
+                                            @error('tipo_quarto_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+
                                         </div>
+
                                         <div class="col-md-6 mb-3">
                                             <label><i class="fas fa-toggle-on me-1 text-secondary"></i>Status</label>
                                             <select class="form-control" name="status" required>
@@ -311,17 +333,23 @@
                                 </div>
 
                                 <!-- Preço -->
+                                <!-- Preço e Tipo de Cobrança -->
                                 <div class="card mb-3 shadow-sm">
                                     <div class="card-header bg-light">
                                         <strong><i class="fas fa-money-bill-wave me-2 text-primary"></i>Valores</strong>
                                     </div>
                                     <div class="card-body">
-                                        <div class="mb-3">
+                                        <div class="mb-3" id="preco-wrapper">
                                             <label><i class="fas fa-coins me-1 text-secondary"></i>Preço por Noite</label>
-                                            <input type="number" name="preco_noite" class="form-control" step="0.01" required>
+                                            <input type="number" name="preco_noite" id="preco_noite" class="form-control" step="0.01" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label><i class="fas fa-credit-card me-1 text-secondary"></i>Tipo de Cobrança</label>
+                                            <input type="text" name="tipo_cobranca" id="tipo_cobranca" class="form-control" readonly required>
                                         </div>
                                     </div>
                                 </div>
+
 
                                 <!-- Descrição -->
                                 <div class="card mb-3 shadow-sm">
@@ -338,6 +366,7 @@
 
                             </div>
 
+
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i>Salvar</button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i>Cancelar</button>
@@ -347,6 +376,25 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            document.getElementById('tipo_quarto_id').addEventListener('change', function() {
+                const selected = this.options[this.selectedIndex];
+                const preco = selected.getAttribute('data-preco');
+                const cobranca = selected.getAttribute('data-cobranca');
+
+                const precoInput = document.getElementById('preco_noite');
+                const cobrancaInput = document.getElementById('tipo_cobranca');
+                const wrapper = document.getElementById('preco-wrapper');
+
+                if (preco && wrapper) {
+                    precoInput.value = preco;
+                    cobrancaInput.value = cobranca;
+                    wrapper.style.display = 'block';
+                }
+            });
+        </script>
+
 
     </main>
     @include('layouts.customise')

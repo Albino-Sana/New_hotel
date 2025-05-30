@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Quarto;
+use App\Models\User;
 use App\Models\Hospede;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -41,4 +42,11 @@ class Reserva extends Model
     {
         return $this->belongsTo(Quarto::class);
     }
+
+public function user()
+{
+    return $this->belongsTo(User::class, 'user_id'); // ou outro nome da coluna se não for 'user_id'
+}
+
+
 }

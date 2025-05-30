@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('numero')->unique();
             $table->integer('andar');
-            $table->foreignId('tipo_quarto_id')->constrained('tipo_quartos')->onDelete('cascade');
+       $table->unsignedBigInteger('tipo_quarto_id');
+        $table->foreign('tipo_quarto_id')->references('id')->on('tipos_quartos');
             $table->enum('status', ['Disponível', 'Ocupado', 'Manutenção'])->default('Disponível');
-            $table->decimal('preco_noite', 10, 2)->nullable();
+            $table->decimal('preco_noite', 8, 2);
+            $table->string('tipo_cobranca')->nullable();
             $table->string('descricao')->nullable();
             $table->timestamps();
         });

@@ -6,7 +6,7 @@
 <!-- Font Awesome Icons -->
 <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
 <!-- CSS Files -->
-<link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
+ <link id="pagestyle" href="{{ asset('assets/css/argon-dashboard.css?v=2.1.0') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-icons.css" />
 <link rel="stylesheet" href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/argon-dashboard.css?v=2.1.0" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">

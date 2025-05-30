@@ -24,4 +24,9 @@ class CheckoutHospede extends Model
     {
         return $this->belongsTo(Hospede::class);
     }
+
+    public function checkout()
+    {
+        return $this->belongsTo(Checkout::class, 'checkout_id', 'id');
+    }
 }

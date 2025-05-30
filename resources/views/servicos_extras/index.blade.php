@@ -57,13 +57,13 @@
                                                 <h6 class="mb-0 text-sm">{{ $servico->nome }}</h6>
                                             </td>
                                             <td class="text-center"><span class="text-secondary text-xs">{{ $servico->descricao }}</span></td>
-                                            <td class="text-center"><span class="text-secondary text-xs">kz {{ number_format($servico->preco, 2, ',', '.') }}</span></td>
+                                            <td class="text-center"><span class="text-secondary text-xs">{{ number_format($servico->preco, 2, ',', '.') }} kz</span></td>
                                             <td class="text-center"><span class="text-secondary text-xs">{{ $servico->created_at->format('d/m/Y') }}</span></td>
                                             <td class="text-center">
                                                 <a href="#" class="text-secondary font-weight-bold text-xs" data-bs-toggle="modal" data-bs-target="#editarServicoModal{{ $servico->id }}">Editar</a>
                                                 <form action="{{ route('servicos_extras.destroy', $servico) }}" method="POST" style="display:inline;">
                                                     @csrf @method('DELETE')
-                                                    <button type="submit" class="text-danger font-weight-bold text-xs border-0 bg-transparent" onclick="return confirm('Tem certeza?')" title="Excluir serviço">
+                                                    <button type="button" class="text-danger font-weight-bold text-xs border-0 bg-transparent btn-delete" title="Excluir serviço">
                                                         Excluir
                                                     </button>
                                                 </form>

@@ -19,7 +19,10 @@ class Quarto extends Model
         'tipo_quarto_id',
         'status',
         'preco_noite',
+        'tipo_cobranca',
         'descricao',
+        'updated_at',
+        'created_at',
     ];
 
     public function checkin()
@@ -35,11 +38,10 @@ public function hospede()
     return $this->hasOne(Hospede::class, 'quarto_id')->latest(); 
 }
 
-
-
-
     public function tipo()
     {
         return $this->belongsTo(TipoQuarto::class, 'tipo_quarto_id');
     }
+
+
 }

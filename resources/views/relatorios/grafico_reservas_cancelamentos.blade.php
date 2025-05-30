@@ -4,9 +4,9 @@
     var reservasChart;
 
     const mesesPTBR = {
-        'Jan': 'Jan', 'Feb': 'Fev', 'Mar': 'Mar', 'Apr': 'Abr', 'May': 'Mai',
-        'Jun': 'Jun', 'Jul': 'Jul', 'Aug': 'Ago', 'Sep': 'Set', 'Oct': 'Out',
-        'Nov': 'Nov', 'Dec': 'Dez'
+        'Jan': 'Janeiro', 'Feb': 'Fevereiro', 'Mar': 'Março', 'Apr': 'Abril', 'May': 'Maio',
+        'Jun': 'Junho', 'Jul': 'Julho', 'Aug': 'Agosto', 'Sep': 'Setembro', 'Oct': 'Outubro',
+        'Nov': 'Novembro', 'Dec': 'Dezembro'
     };
 
     function traduzirLabels(labels) {
@@ -161,12 +161,24 @@
             });
     }
 
+    // Função para baixar o PDF
+    function baixarPDF(periodo) {
+        const url = `/relatorios/relatorio-reservas-cancelamentos-pdf?periodo=${periodo}`;
+        window.open(url, '_blank'); // Abre ou baixa o PDF dependendo do backend
+    }
+
     document.querySelectorAll('.periodo-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             carregarDadosReservas(this.dataset.periodo);
         });
+    });
+
+    // Adiciona evento ao botão de PDF
+    document.getElementById('btn-pdf').addEventListener('click', function () {
+        const activePeriodo = document.querySelector('.periodo-btn.active').dataset.periodo;
+        baixarPDF(activePeriodo);
     });
 
     document.addEventListener('DOMContentLoaded', function () {

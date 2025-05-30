@@ -33,90 +33,105 @@
                             <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoHospede">Novo Hóspede</button>
                         </div>
 
-                        <div class="card-body px-0 pb-2">
-                            <div class="table-responsive p-0">
-                                <table class="table align-items-center mb-0 table-striped" id="Table">
-                                    <thead>
+                        <div class="card-body px-0 pt-0 pb-2">
+                            <div class="table-responsive">
+                                <table class="table align-items-center mb-0 table-hover" id="Table" style="width:100%">
+                                    <thead class="thead-light">
                                         <tr>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nome</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Email</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Telefone</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Entrada</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Saída</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quarto</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Valor Total</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nº Pessoas</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ações</th>
+                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 ps-3">#ID</th>
+                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Hóspede</th>
+                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 d-none d-lg-table-cell">Contato</th>
+                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Período</th>
+                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Quarto</th>
+                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 d-none d-md-table-cell">Valor</th>
+                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Status</th>
+                                            <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7 text-center">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($hospedes as $hospede)
                                         <tr>
-                                            <td class="ps-4">
-                                                <p class="text-xs font-weight-bold mb-0">{{ $hospede->id }}</p>
+                                            <td class="ps-3">
+                                                <span class="text-xs font-weight-bold">{{ $hospede->id }}</span>
                                             </td>
+
                                             <td>
-                                                <div class="d-flex px-2 py-1">
-                                                    <div class="d-flex flex-column justify-content-center">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar avatar-sm me-2">
+                                                        <span class="avatar-initial rounded-circle bg-gradient-{{ 
+                            $hospede->status === 'hospedado' ? 'info' : 
+                            ($hospede->status === 'finalizado' ? 'success' : 'secondary') 
+                        }} text-white">
+                                                            {{ substr($hospede->nome, 0, 1) }}
+                                                        </span>
+                                                    </div>
+                                                    <div>
                                                         <h6 class="mb-0 text-sm">{{ $hospede->nome }}</h6>
+                                                        <small class="text-xs text-secondary d-lg-none">{{ $hospede->email }}</small>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">{{ $hospede->email }}</p>
+
+                                            <td class="d-none d-lg-table-cell">
+                                                <p class="text-xs mb-0">{{ $hospede->email }}</p>
+                                                <p class="text-xs text-secondary mb-0">{{ $hospede->telefone }}</p>
                                             </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">{{ $hospede->telefone }}</p>
+
+                                            <td style="min-width: 120px;">
+                                                <div class="d-flex flex-column">
+                                                    <span class="text-xs font-weight-bold">{{ $hospede->data_entrada->format('d/m/Y') }}</span>
+                                                    <span class="text-xs text-secondary">{{ $hospede->data_saida->format('d/m/Y') }}</span>
+                                                </div>
                                             </td>
+
                                             <td>
-                                                <p class="text-xs font-weight-bold mb-0">{{ $hospede->data_entrada->format('d/m/Y') }}</p>
+                                                <span class="badge bg-gradient-primary">{{ $hospede->quarto->numero ?? '-' }}</span>
                                             </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">{{ $hospede->data_saida->format('d/m/Y') }}</p>
+
+                                            <td class="d-none d-md-table-cell">
+                                                <span class="text-xs font-weight-bold">{{ number_format($hospede->checkoutHospede ? $hospede->checkoutHospede->valor_total : $hospede->valor_a_pagar, 2, ',', '.') }} kz</span>
                                             </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">{{ $hospede->quarto->numero ?? '-' }}</p>
-                                            </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">{{ number_format($hospede->checkoutHospede ? $hospede->checkoutHospede->valor_total : $hospede->valor_a_pagar, 2, ',', '.') }} kz</p>
-                                            </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">{{ $hospede->numero_pessoas }}</p>
-                                            </td>
+
                                             <td>
                                                 <span class="badge bg-gradient-{{
-                            $hospede->status === 'hospedado' ? 'info' : 
-                            ($hospede->status === 'finalizado' ? 'success' : 'secondary')
-                        }}">
-                                                    {{ ucfirst($hospede->status ?? 'Hospedado') }}
+                    $hospede->status === 'hospedado' ? 'info' : 
+                    ($hospede->status === 'finalizado' ? 'success' : 'secondary')
+                }}">
+                                                    {{ ucfirst($hospede->status) }}
                                                 </span>
                                             </td>
-                                            <td>
-                                                <div class="d-flex justify-content-center">
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#editarHospedeModal{{ $hospede->id }}" class="text-secondary font-weight-bold text-xs me-3" data-toggle="tooltip" title="Editar">
-                                                        <i class="fas fa-pen-to-square"></i>
+
+                                            <td class="text-center" style="min-width: 120px;">
+                                                <div class="d-flex justify-content-center gap-1">
+                                                    <!-- Editar -->
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#editarHospedeModal{{ $hospede->id }}"
+                                                        class="btn btn-icon-only btn-sm btn-outline-primary rounded-circle"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Editar">
+                                                        <i class="fas fa-pen fa-xs"></i>
                                                     </a>
 
                                                     @if($hospede->status !== 'finalizado')
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#checkoutHospedeModal{{ $hospede->id }}" class="text-success font-weight-bold text-xs me-3" data-toggle="tooltip" title="Check-out">
-                                                        <i class="fas fa-right-from-bracket"></i>
+                                                    <!-- Check-out -->
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#checkoutHospedeModal{{ $hospede->id }}"
+                                                        class="btn btn-icon-only btn-sm btn-outline-success rounded-circle"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Check-out">
+                                                        <i class="fas fa-sign-out-alt fa-xs"></i>
                                                     </a>
                                                     @endif
 
-                                                    <form action="{{ route('hospedes.destroy', $hospede) }}" method="POST" style="display:inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" onclick="return confirm('Tem certeza?')" class="text-danger font-weight-bold text-xs border-0 bg-transparent" data-toggle="tooltip" title="Excluir">
-                                                            <i class="fas fa-trash-can"></i>
+                                                    <!-- Excluir -->
+                                                    <form action="{{ route('hospedes.destroy', $hospede) }}" method="POST" class="d-inline">
+                                                        @csrf @method('DELETE')
+                                                        <button type="button"
+                                                            class="btn btn-icon-only btn-sm btn-outline-danger rounded-circle btn-delete"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Excluir">
+                                                            <i class="fas fa-trash fa-xs"></i>
                                                         </button>
                                                     </form>
+
                                                 </div>
                                             </td>
                                         </tr>
-
-                                        <!-- Modal Editar Hóspede -->
                                         <div class="modal fade" id="editarHospedeModal{{ $hospede->id }}" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                                 <div class="modal-content">
@@ -208,7 +223,7 @@
                                                 <div class="modal-content">
                                                     <form action="{{ route('hospedes.checkout', $hospede->id) }}" method="POST">
                                                         @csrf
-                                                        <div class="modal-header bg-gradient-success text-white">
+                                                        <div class="modal-header bg-gradient-primary text-white">
                                                             <h5 class="modal-title text-white">
                                                                 <i class="fas fa-sign-out-alt me-2"></i>Check-out de {{ $hospede->nome }}
                                                             </h5>
@@ -273,18 +288,18 @@
                                         @endforeach
                                     </tbody>
                                 </table>
-                                <div class="p-3">
-                                    {{ $hospedes->links() }}
-                                </div>
+                            </div>
+
+                            <div class="px-3 pt-2">
+                                {{ $hospedes->links() }}
                             </div>
                         </div>
-
 
 
                     </div>
                 </div>
             </div>
-            
+
             <!-- Modal de Adicionar Hóspede -->
             <div class="modal fade" id="modalNovoHospede" tabindex="-1" aria-labelledby="modalAdicionarHospedeLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -379,6 +394,8 @@
             </div>
 
         </div>
+
+
 
         </div>
     </main>

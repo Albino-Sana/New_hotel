@@ -34,78 +34,129 @@
                         </div>
 
                         <div class="card-body px-0 pb-2">
-                            <div class="table-responsive p-0">
+                            <div class="table-responsive">
                                 <table class="table align-items-center mb-0" id="Table">
-                                    <thead>
+                                    <thead class="thead-light">
                                         <tr>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-3">ID</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cliente</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quarto</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Preço</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Número de Pessoas</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-md-table-cell">Quarto</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Valor</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-sm-table-cell">Pessoas</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Entrada</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Saída</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 d-none d-lg-table-cell">Saída</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                                            <th class="text-secondary opacity-7">Ações</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($reservas as $reserva)
                                         <tr>
-                                            <td class="ps-3">{{ $reserva->id }}</td>
-                                            <td>
-                                                <h6 class="mb-0 text-sm">{{ $reserva->cliente_nome }}</h6>
-                                                <p class="text-xs text-secondary mb-0">{{ $reserva->cliente_email ?? '---' }}</p>
+                                            <td class="ps-3">
+                                                <span class="text-xs font-weight-bold">{{ $reserva->id }}</span>
                                             </td>
+
                                             <td>
-                                                <a href="{{ route('quartos.index') }}">
-                                                    {{ $reserva->quarto->numero }}
+                                                <div class="d-flex flex-column">
+                                                    <h6 class="mb-0 text-sm">{{ $reserva->cliente_nome }}</h6>
+                                                    <small class="text-xs text-secondary">{{ $reserva->cliente_email ?? '---' }}</small>
+                                                </div>
+                                            </td>
+
+                                            <td class="d-none d-md-table-cell">
+                                                <a href="{{ route('quartos.index') }}" class="text-info text-sm text-decoration-none">
+                                                    {{ optional($reserva->quarto)->numero ?? 'Excluido' }}
                                                 </a>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <h6 class="mb-0 text-sm">{{ number_format($reserva->valor_total, 2, ',', '.') }}</h6>
+
+                                            <td>
+                                                <span class="text-xs font-weight-bold">{{ number_format($reserva->valor_total, 2, ',', '.') }} kz</span>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span class="text-secondary text-xs font-weight-bold">{{ $reserva->numero_pessoas }}</span>
+
+                                            <td class="d-none d-sm-table-cell">
+                                                <span class="badge bg-gradient-secondary">{{ $reserva->numero_pessoas }}</span>
                                             </td>
-                                            <td>{{ \Carbon\Carbon::parse($reserva->data_entrada)->format('d/m/Y') }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($reserva->data_saida)->format('d/m/Y') }}</td>
+
+                                            <td>
+                                                <span class="text-xs">{{ \Carbon\Carbon::parse($reserva->data_entrada)->format('d/m/Y') }}</span>
+                                            </td>
+
+                                            <td class="d-none d-lg-table-cell">
+                                                <span class="text-xs">{{ \Carbon\Carbon::parse($reserva->data_saida)->format('d/m/Y') }}</span>
+                                            </td>
+
                                             <td>
                                                 <span class="badge bg-gradient-{{
-                                                        $reserva->status === 'reservado' ? 'info' :
-                                                        ($reserva->status === 'finalizado' ? 'success' : 'secondary')
-                                                    }}">{{ ucfirst($reserva->status) }}</span>
+                                                    $reserva->status === 'reservado' ? 'info' :
+                                                    ($reserva->status === 'finalizado' ? 'success' : 'secondary')
+                                                }}">{{ ucfirst($reserva->status) }}</span>
                                             </td>
+
                                             <td>
-                                                <a href="#" class="text-secondary font-weight-bold text-xs me-2" data-bs-toggle="modal" data-bs-target="#editarModal{{ $reserva->id }}">
-                                                    Editar
-                                                </a>
-
-                                                <form action="{{ route('reservas.destroy', $reserva) }}" method="POST" style="display:inline">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="text-danger font-weight-bold text-xs border-0 bg-transparent" onclick="return confirm('Tem certeza?')">
-                                                        Cancelar
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <!-- Botão Ver -->
+                                                    <button class="btn btn-sm btn-icon-only btn-outline-info rounded-circle"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#verModal{{ $reserva->id }}"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        title="Visualizar">
+                                                        <i class="fas fa-eye fa-xs"></i>
                                                     </button>
-                                                </form>
 
-                                                <!-- Exibir botão Check-in apenas se a reserva estiver "Reservado" -->
-
-                                                @if($reserva->status == 'reservado')
-                                                <form action="{{ route('reservas.checkin', $reserva->id) }}" method="POST" class="form-checkin" data-id="{{ $reserva->id }}" style="display: inline;">
-                                                    @csrf
-                                                    <button type="button" class="text-success font-weight-bold text-xs border-0 bg-transparent" data-toggle="tooltip" title="Check-in">
-                                                        <i class="fas fa-check-circle"></i> Check-in
+                                                    @if($reserva->status !== 'finalizado')
+                                                    <!-- Botão Editar -->
+                                                    <button class="btn btn-sm btn-icon-only btn-outline-primary rounded-circle"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editarModal{{ $reserva->id }}"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        title="Editar">
+                                                        <i class="fas fa-edit fa-xs"></i>
                                                     </button>
-                                                </form>
-                                                @endif
 
+                                                    <!-- Botão Cancelar -->
+                                                    <form action="{{ route('reservas.cancelar', $reserva) }}" method="POST" class="d-inline">
+                                                        @csrf @method('DELETE')
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-icon-only btn-outline-danger rounded-circle btn-delete"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
+                                                            title="Cancelar">
+                                                            <i class="fas fa-times fa-xs"></i>
+                                                        </button>
+                                                    </form>
 
-                                                <!-- Link para ver detalhes -->
-                                                <a href="#" class="text-secondary font-weight-bold text-xs" data-bs-toggle="modal" data-bs-target="#verModal{{ $reserva->id }}">
-                                                    Ver
-                                                </a>
+                                                    <!-- Botão Eliminar (apenas para admin) -->
+
+                                                    <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" class="d-inline">
+                                                        @csrf @method('DELETE')
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-icon-only btn-outline-dark rounded-circle btn-delete-permanent"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
+                                                            title="Eliminar permanentemente">
+                                                            <i class="fas fa-trash fa-xs"></i>
+                                                        </button>
+                                                    </form>
+
+                                                    @endif
+
+                                                    @if($reserva->status == 'reservado')
+                                                    <!-- Botão Check-in -->
+                                                    <form action="{{ route('reservas.checkin', $reserva->id) }}" method="POST" class="d-inline form-checkin" data-id="{{ $reserva->id }}">
+                                                        @csrf
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-icon-only btn-outline-success rounded-circle"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
+                                                            title="Fazer Check-in">
+                                                            <i class="fas fa-check-circle fa-xs"></i>
+                                                        </button>
+                                                    </form>
+                                                    @endif
+                                                </div>
                                             </td>
-
                                         </tr>
 
                                         <!-- Modal de Editar Reserva -->
@@ -165,9 +216,17 @@
                                                                     <div class="col-md-6 mb-3">
                                                                         <label><i class="fas fa-bed me-1 text-secondary"></i>Quarto</label>
                                                                         <select class="form-control" name="quarto_id">
+                                                                            @if ($reserva->quarto)
                                                                             <option value="{{ $reserva->quarto_id }}" selected>
                                                                                 {{ $reserva->quarto->numero }} - {{ $reserva->quarto->status }}
                                                                             </option>
+                                                                            @else
+                                                                            <option value="{{ $reserva->quarto_id }}" selected disabled>
+                                                                                Quarto excluído
+                                                                            </option>
+                                                                            @endif
+
+
                                                                             @foreach($quartos as $quarto)
                                                                             <option value="{{ $quarto->id }}">
                                                                                 {{ $quarto->numero }} - {{ $quarto->status }}
@@ -222,34 +281,122 @@
 
 
                                         <!-- Modal de Ver Reserva -->
-                                        <div class="modal fade" id="verModal{{ $reserva->id }}" tabindex="-1" aria-labelledby="verModalLabel{{ $reserva->id }}" aria-hidden="true">
-                                            <div class="modal-dialog">
+                                        <div class="modal fade" id="verModal{{ $reserva->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="verModalLabel{{ $reserva->id }}">Detalhes da Reserva</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                                    <div class="modal-header bg-primary text-white">
+                                                        <h5 class="modal-title text-white">Detalhes da Reserva #{{ $reserva->id }}</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <!-- Detalhes da Reserva -->
-                                                        <p><strong>Nome do Cliente:</strong> {{ $reserva->cliente_nome }}</p>
-                                                        <p><strong>Documento:</strong> {{ $reserva->cliente_documento }}</p>
-                                                        <p><strong>Telefone:</strong> {{ $reserva->cliente_telefone ?? 'N/A' }}</p>
-                                                        <p><strong>E-mail:</strong> {{ $reserva->cliente_email ?? 'N/A' }}</p>
-                                                        <p><strong>Quarto:</strong> {{ $reserva->quarto->numero }} - {{ $reserva->quarto->status }}</p>
-                                                        <p><strong>Data de Entrada:</strong> {{ $reserva->data_entrada }}</p>
-                                                        <p><strong>Data de Saída:</strong> {{ $reserva->data_saida }}</p>
-                                                        <p><strong>Status:</strong> {{ $reserva->status }}</p>
-                                                        <p><strong>Valor Total:</strong> R$ {{ number_format($reserva->valor_total, 2, ',', '.') }}</p>
-                                                        <p><strong>Número de Pessoas:</strong> {{ $reserva->numero_pessoas }}</p>
-                                                        <p><strong>Observações:</strong> {{ $reserva->observacoes ?? 'Nenhuma' }}</p>
+                                                        <div class="row">
+                                                            <!-- Coluna 1 -->
+                                                            <div class="col-md-6">
+                                                                <div class="card mb-3 shadow-sm">
+                                                                    <div class="card-header bg-light">
+                                                                        <strong><i class="fas fa-user me-2"></i>Informações do Cliente</strong>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <p><strong>Nome:</strong> {{ $reserva->cliente_nome }}</p>
+                                                                        <p><strong>Documento:</strong> {{ $reserva->cliente_documento }}</p>
+                                                                        <p><strong>Telefone:</strong> {{ $reserva->cliente_telefone ?? 'Excluido' }}</p>
+                                                                        <p><strong>E-mail:</strong> {{ $reserva->cliente_email ?? 'Excluido' }}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Coluna 2 -->
+                                                            <div class="col-md-6">
+                                                                <div class="card mb-3 shadow-sm">
+                                                                    <div class="card-header bg-light">
+                                                                        <strong><i class="fas fa-hotel me-2"></i>Informações da Hospedagem</strong>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        @if ($reserva->quarto)
+                                                                        <p><strong>Quarto:</strong> {{ $reserva->quarto->numero }} ({{ $reserva->quarto->tipo->nome }})</p>
+                                                                        <p><strong>Status do Quarto:</strong>
+                                                                            <span class="badge bg-gradient-{{ $reserva->quarto->status == 'Disponível' ? 'success' : ($reserva->quarto->status == 'Ocupado' ? 'danger' : 'warning') }}">
+                                                                                {{ $reserva->quarto->status }}
+                                                                            </span>
+                                                                        </p>
+                                                                        @else
+                                                                        <p><strong>Quarto:</strong> <span class="text-danger">Quarto excluído</span></p>
+                                                                        @endif
+
+                                                                        <p><strong>Check-in:</strong> {{ \Carbon\Carbon::parse($reserva->data_entrada)->format('d/m/Y H:i') }}</p>
+                                                                        <p><strong>Check-out:</strong> {{ \Carbon\Carbon::parse($reserva->data_saida)->format('d/m/Y H:i') }}</p>
+                                                                        <p><strong>Noites:</strong> {{ \Carbon\Carbon::parse($reserva->data_entrada)->diffInDays($reserva->data_saida) }}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Nova Seção - Responsável pela Reserva -->
+                                                            <div class="col-12 mt-3">
+                                                                <div class="card shadow-sm">
+                                                                    <div class="card-header bg-light">
+                                                                        <strong><i class="fas fa-user-tie me-2"></i>Responsável pela Reserva</strong>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <div class="d-flex align-items-center">
+                                                                            @if($reserva->user)
+                                                                            <div class="avatar avatar-sm me-3">
+                                                                                <span class="avatar-initial rounded-circle bg-gradient-secondary">
+                                                                                    {{ substr($reserva->user->name, 0, 1) }}
+                                                                                </span>
+                                                                            </div>
+                                                                            <div>
+                                                                                <h6 class="mb-0">{{ $reserva->user->name }}</h6>
+                                                                                <small class="text-muted">
+                                                                                    Email: {{ $reserva->user->email ?? '---' }}<br>
+                                                                                    Registrado em: {{ $reserva->user->created_at->format('d/m/Y') }}
+                                                                                </small>
+                                                                            </div>
+                                                                            @else
+                                                                            <div class="text-muted">
+                                                                                <i class="fas fa-user-slash me-2"></i> Usuário não identificado
+                                                                            </div>
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <!-- Seção de Valores -->
+                                                            <div class="col-12 mt-3">
+                                                                <div class="card shadow-sm">
+                                                                    <div class="card-header bg-light">
+                                                                        <strong><i class="fas fa-money-bill-wave me-2"></i>Valores</strong>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <div class="row">
+                                                                            <div class="col-md-6">
+                                                                                <p><strong>Valor Total:</strong> {{ number_format($reserva->valor_total, 2, ',', '.') }} kz</p>
+                                                                                <p><strong>Nº de Pessoas:</strong> {{ $reserva->numero_pessoas }}</p>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <p><strong>Observações:</strong> {{ $reserva->observacoes ?? 'Nenhuma' }}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                                        @if($reserva->status == 'reservado')
+                                                        <form action="{{ route('reservas.checkin', $reserva->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success">
+                                                                <i class="fas fa-check-circle me-1"></i> Fazer Check-in
+                                                            </button>
+                                                        </form>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -374,7 +521,7 @@
 
     <!--   Core JS Files   -->
     @include('components.js')
- 
+
 
 </body>
 

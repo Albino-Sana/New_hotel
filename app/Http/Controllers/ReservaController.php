@@ -15,18 +15,18 @@ use App\Mail\NotificarReservaEmail;
 
 class ReservaController extends Controller
 {
-    public function index()
-    {
-        
-        $reservas = Reserva::with('quarto')->orderBy('data_entrada', 'desc')->get();
-        $quartos = Quarto::where('status', 'disponivel')->get();
-        return view('reservas.index', compact('reservas', 'quartos'));
-    }
+public function index()
+{
+    $reservas = Reserva::with(['quarto.tipo', 'user'])->orderBy('data_entrada', 'desc')->get();
+    $quartos = Quarto::where('status', 'disponivel')->get();
+    return view('reservas.index', compact('reservas', 'quartos'));
+}
 
     public function store(Request $request)
     {
         // Validação dos dados
         $request->validate([
+
             'cliente_nome' => 'required',
             'cliente_documento' => 'required',
             'cliente_email' => 'nullable|email',
@@ -65,6 +65,7 @@ class ReservaController extends Controller
             $reserva->observacoes = $request->observacoes;
             $reserva->numero_pessoas = $request->numero_pessoas; // Adicionando o número de pessoas
             $reserva->status = 'Reservado'; // Status inicial
+             $reserva->user_id = Auth::id();
             $reserva->save();
     
             // Atualiza o status do quarto para 'Reservado'
@@ -78,7 +79,19 @@ class ReservaController extends Controller
         }
     }
     
-    
+    public function cancelar($id)
+{
+    try {
+        $reserva = Reserva::findOrFail($id);
+        $reserva->status = 'cancelada';
+        $reserva->save();
+
+        return back()->with('success', 'Reserva cancelada com sucesso!');
+    } catch (\Exception $e) {
+        return back()->with('error', 'Erro ao cancelar a reserva.');
+    }
+}
+
 
     public function edit(Reserva $reserva)
     {
@@ -154,7 +167,7 @@ class ReservaController extends Controller
     $reserva->save();
 
     // Atualiza o status do quarto também
-    $reserva->quarto->status = 'ocupado';
+    $reserva->quarto->status = 'Ocupado';
     $reserva->quarto->save();
 
     return redirect()->back()->with('success', 'Check-in realizado com sucesso!');

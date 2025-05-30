@@ -60,7 +60,7 @@ public function store(Request $request)
             'status' => 'hospedado',
         ]);
 
-        Quarto::where('id', $request->quarto_id)->update(['status' => 'ocupado']);
+        Quarto::where('id', $request->quarto_id)->update(['status' => 'Ocupado']);
         Reserva::where('id', $request->reserva_id)->update(['status' => 'hospedado']);
 
         DB::commit();

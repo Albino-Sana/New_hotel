@@ -119,7 +119,8 @@
                         @if(strtolower($quarto->status) === 'ocupado')
                         <!-- Adicionar consumo -->
                         <button class="btn btn-sm btn-outline-primary w-100 mb-2 rounded-pill"
-                            data-bs-toggle="modal" data-bs-target="#consumoModal{{ $quarto->id }}">
+                            data-bs-toggle="modal"
+                            data-bs-target="#consumoModal{{ $quarto->id }}">
                             <i class="fas fa-plus-circle me-1"></i> Adicionar serviço
                         </button>
 
@@ -172,13 +173,13 @@
     <div class="footer-menu fixed-bottom bg-white shadow-lg py-3 border-top">
         <div class="container">
             <div class="row justify-content-center g-2">
-        
+
                 <div class="col-auto">
                     <button class="btn btn-success rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#quickCheckinModal">
                         <i class="fas fa-bolt me-2"></i> Check-in Rápido
                     </button>
                 </div>
-  
+
                 <div class="col-auto">
                     <button class="btn btn-warning rounded-pill px-3 shadow-sm">
                         <i class="fas fa-receipt me-2"></i> Faturas
@@ -383,7 +384,73 @@
         </div>
     </div>
 
+<!-- Modal de Adicionar Serviço -->
+<div class="modal fade" id="consumoModal{{ $quarto->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="{{ route('corrente-servicos.store') }}" method="POST">
+                @csrf
+                
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-concierge-bell me-2"></i> Adicionar Serviço - Quarto {{ $quarto->numero }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body">
+                    {{-- Identificador da estadia --}}
+                    <input type="hidden" name="hospede_id" value="{{ $quarto->checkin->hospede_id ?? '' }}">
+                    <input type="hidden" name="checkin_id" value="{{ $quarto->checkin->id ?? '' }}">
+                    <input type="hidden" name="quarto_id" value="{{ $quarto->id }}">
 
+                    <div class="mb-3">
+                        <label class="form-label">Serviço</label>
+                        <select name="servico_adicional_id" class="form-select" required>
+                            <option value="">Selecione um serviço...</option>
+                            @foreach($servicosAdicionais as $s)
+                                <option value="{{ $s->id }}" data-preco="{{ $s->preco }}">
+                                    {{ $s->nome }} – {{ number_format($s->preco,2,',','.') }} Kz
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Quantidade</label>
+                            <input type="number" min="1" name="quantidade" class="form-control" value="1" required>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Valor unitário (Kz)</label>
+                            <input type="text" name="valor_unitario" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Total (Kz)</label>
+                            <input type="text" name="valor_total" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observação</label>
+                        <textarea name="observacao" class="form-control" rows="2" placeholder="Detalhes adicionais..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Lançar serviço
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
     <!-- Script para preencher campos -->
     <script>
         document.getElementById('reserva_id').addEventListener('change', function() {
@@ -501,77 +568,77 @@
     @endforeach
 
 
-@foreach($quartos as $quarto)
+    @foreach($quartos as $quarto)
     @if($quarto->hospede)
-        <div class="modal fade" id="modalCheckoutHospede-{{ $quarto->hospede->id }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <form action="{{ route('hospedes.checkout', $quarto->hospede->id) }}" method="POST">
-                        @csrf
-                        <div class="modal-header  bg-gradient-primary text-white">
-                            <h5 class="modal-title text-white">
-                                <i class="fas fa-sign-out-alt me-2"></i>Check-out de {{ $quarto->hospede->nome }}
-                            </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                        </div>
+    <div class="modal fade" id="modalCheckoutHospede-{{ $quarto->hospede->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <form action="{{ route('hospedes.checkout', $quarto->hospede->id) }}" method="POST">
+                    @csrf
+                    <div class="modal-header  bg-gradient-primary text-white">
+                        <h5 class="modal-title text-white">
+                            <i class="fas fa-sign-out-alt me-2"></i>Check-out de {{ $quarto->hospede->nome }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
 
-                        <div class="modal-body">
-                            <div class="card mb-3 shadow-sm">
-                                <div class="card-header bg-light">
-                                    <strong><i class="fas fa-info-circle me-2 text-primary"></i>Detalhes da Hospedagem</strong>
-                                </div>
-                                <div class="card-body row">
-                                    <div class="col-md-6 mb-3">
-                                        <label><i class="fas fa-user me-1 text-secondary"></i>Nome</label>
-                                        <input type="text" class="form-control" value="{{ $quarto->hospede->nome }}" readonly>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label><i class="fas fa-door-open me-1 text-secondary"></i>Quarto</label>
-                                        <input type="text" class="form-control" value="{{ $quarto->hospede->quarto->numero ?? '-' }}" readonly>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label><i class="fas fa-sign-in-alt me-1 text-secondary"></i>Data de Entrada</label>
-                                        <input type="text" class="form-control" value="{{ $quarto->hospede->data_entrada->format('d/m/Y') }}" readonly>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label><i class="fas fa-sign-out-alt me-1 text-secondary"></i>Data de Saída</label>
-                                        <input type="text" class="form-control" value="{{ $quarto->hospede->data_saida->format('d/m/Y') }}" readonly>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label><i class="fas fa-money-bill-wave me-1 text-secondary"></i>Valor da Hospedagem</label>
-                                        <input type="text" class="form-control" value="{{ number_format($quarto->hospede->valor_a_pagar, 2, ',', '.') }} kz" readonly>
-                                    </div>
-                                </div>
+                    <div class="modal-body">
+                        <div class="card mb-3 shadow-sm">
+                            <div class="card-header bg-light">
+                                <strong><i class="fas fa-info-circle me-2 text-primary"></i>Detalhes da Hospedagem</strong>
                             </div>
-
-                            <div class="card mb-3 shadow-sm">
-                                <div class="card-header bg-light">
-                                    <strong><i class="fas fa-concierge-bell me-2 text-primary"></i>Serviços Extras (Opcional)</strong>
+                            <div class="card-body row">
+                                <div class="col-md-6 mb-3">
+                                    <label><i class="fas fa-user me-1 text-secondary"></i>Nome</label>
+                                    <input type="text" class="form-control" value="{{ $quarto->hospede->nome }}" readonly>
                                 </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label><i class="fas fa-list me-1 text-secondary"></i>Selecione os serviços utilizados</label>
-                                        <select class="form-control" name="servicos[]" multiple>
-                                            @foreach($servicosAdicionais as $servico)
-                                                <option value="{{ $servico->id }}">{{ $servico->nome }} - {{ number_format($servico->preco, 2, ',', '.') }} kz</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                <div class="col-md-6 mb-3">
+                                    <label><i class="fas fa-door-open me-1 text-secondary"></i>Quarto</label>
+                                    <input type="text" class="form-control" value="{{ $quarto->hospede->quarto->numero ?? '-' }}" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label><i class="fas fa-sign-in-alt me-1 text-secondary"></i>Data de Entrada</label>
+                                    <input type="text" class="form-control" value="{{ $quarto->hospede->data_entrada->format('d/m/Y') }}" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label><i class="fas fa-sign-out-alt me-1 text-secondary"></i>Data de Saída</label>
+                                    <input type="text" class="form-control" value="{{ $quarto->hospede->data_saida->format('d/m/Y') }}" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label><i class="fas fa-money-bill-wave me-1 text-secondary"></i>Valor da Hospedagem</label>
+                                    <input type="text" class="form-control" value="{{ number_format($quarto->hospede->valor_a_pagar, 2, ',', '.') }} kz" readonly>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-sign-out-alt me-1"></i> Confirmar Check-out
-                            </button>
+                        <div class="card mb-3 shadow-sm">
+                            <div class="card-header bg-light">
+                                <strong><i class="fas fa-concierge-bell me-2 text-primary"></i>Serviços Extras (Opcional)</strong>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label><i class="fas fa-list me-1 text-secondary"></i>Selecione os serviços utilizados</label>
+                                    <select class="form-control" name="servicos[]" multiple>
+                                        @foreach($servicosAdicionais as $servico)
+                                        <option value="{{ $servico->id }}">{{ $servico->nome }} - {{ number_format($servico->preco, 2, ',', '.') }} kz</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-sign-out-alt me-1"></i> Confirmar Check-out
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
     @endif
-@endforeach
+    @endforeach
 
 
     @include('components.posjs')

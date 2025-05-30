@@ -31,7 +31,7 @@
                     <div class="card my-4">
                         <div class="shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between align-items-center px-3">
                             <h6 class="text-capitalize">Lista de Tipos de Quartos</h6>
-                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoTipo">Novo Tipo de Quarto</button>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoTipo">Adicionar Tipo</button>
                         </div>
 
                         <div class="card-body px-0 pb-2">
@@ -43,6 +43,8 @@
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nome</th>
                                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Descrição</th>
+                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo de Cobrança</th>
+                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Preço</th>
                                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Criado Em</th>
                                             <th class="text-center text-secondary opacity-7">Ações</th>
                                         </tr>
@@ -60,6 +62,12 @@
                                                 <span class="text-secondary text-xs font-weight-bold">{{ $tipo->descricao }}</span>
                                             </td>
                                             <td class="align-middle text-center">
+                                                <span class="text-secondary text-xs font-weight-bold">{{ $tipo->tipo_cobranca }}</span>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <span class="text-secondary text-xs font-weight-bold">{{ number_format($tipo->preco, 2, ',', '.') }} Kz</span>
+                                            </td>
+                                            <td class="align-middle text-center">
                                                 <span class="text-secondary text-xs font-weight-bold">{{ $tipo->created_at->format('d/m/Y') }}</span>
                                             </td>
                                             <td class="align-middle text-center">
@@ -67,12 +75,15 @@
                                                     Editar
                                                 </a>
                                                 <form action="{{ route('tipos-quartos.destroy', $tipo) }}" method="POST" style="display:inline;">
-                                                    @csrf 
+                                                    @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-danger font-weight-bold text-xs border-0 bg-transparent" onclick="return confirm('Tem certeza?')" title="Excluir tipo de quarto">
+                                                    <button type="button"
+                                                        class="text-danger font-weight-bold text-xs border-0 bg-transparent btn-delete"
+                                                        title="Excluir tipo de quarto">
                                                         Excluir
                                                     </button>
                                                 </form>
+
                                             </td>
                                         </tr>
 
@@ -101,6 +112,18 @@
                                                                         <label><i class="fas fa-tag me-1 text-secondary"></i>Nome</label>
                                                                         <input type="text" name="nome" class="form-control" value="{{ $tipo->nome }}" required>
                                                                     </div>
+                                                                    <div class="mb-3">
+                                                                        <label><i class="fas fa-dollar-sign me-1 text-secondary"></i>Preço</label>
+                                                                        <input type="number" step="0.01" name="preco" class="form-control" value="{{ $tipo->preco }}" placeholder="Ex: 5000.00" required>
+                                                                    </div>
+                                                                    <div class="mb-3">
+                                                                        <label><i class="fas fa-clock me-1 text-secondary"></i>Tipo de Cobrança</label>
+                                                                        <select name="tipo_cobranca" class="form-select" required>
+                                                                            <option value="Por Noite" {{ $tipo->tipo_cobranca == 'Por Noite' ? 'selected' : '' }}>Por Noite</option>
+                                                                            <option value="Por Hora" {{ $tipo->tipo_cobranca == 'Por Hora' ? 'selected' : '' }}>Por Hora</option>
+                                                                        </select>
+                                                                    </div>
+
                                                                     <div class="mb-3">
                                                                         <label><i class="fas fa-align-left me-1 text-secondary"></i>Descrição</label>
                                                                         <textarea name="descricao" class="form-control" rows="3">{{ $tipo->descricao }}</textarea>
@@ -153,12 +176,23 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="mb-3">
-                                            <label><i class="fas fa-tag me-1 text-secondary"></i>Nome</label>
+                                            <label><i class="fas fa-tag me-1 text-secondary"></i>Designação</label>
                                             <input type="text" name="nome" class="form-control" required>
                                         </div>
                                         <div class="mb-3">
                                             <label><i class="fas fa-align-left me-1 text-secondary"></i>Descrição</label>
                                             <textarea name="descricao" class="form-control" rows="3"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label><i class="fas fa-clock me-1 text-secondary"></i>Tipo de Cobrança</label>
+                                            <select name="tipo_cobranca" class="form-select" required>
+                                                <option value="Por Noite">Por Noite</option>
+                                                <option value="Por Hora">Por Hora</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label><i class="fas fa-dollar-sign me-1 text-secondary"></i>Preço</label>
+                                            <input type="number" step="0.01" name="preco" class="form-control" placeholder="Ex: 5000.00" required>
                                         </div>
                                     </div>
                                 </div>

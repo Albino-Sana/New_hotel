@@ -6,9 +6,11 @@ use App\Models\Hospede;
 use App\Models\Quarto;
 use App\Models\CheckoutHospede;
 use App\Models\ServicoAdicional;
+use App\Mail\HospedeCadastrado;
 use App\Models\Estadia;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class HospedeController extends Controller
 {
@@ -17,6 +19,7 @@ class HospedeController extends Controller
         $busca = $request->input('busca');
 
         $hospedes = Hospede::with('quarto', 'checkoutHospede')
+            ->orderBy('created_at', 'desc')
             ->when($busca, function ($query, $busca) {
                 return $query->where('nome', 'like', "%{$busca}%")
                     ->orWhere('email', 'like', "%{$busca}%")
@@ -71,8 +74,12 @@ class HospedeController extends Controller
                 'data_saida' => $request->data_saida,
             ]);
 
+
             $quarto->update(['status' => 'ocupado']);
 
+            if ($request->filled('email')) {
+                Mail::to($request->email)->send(new HospedeCadastrado($hospede, $noites));
+            }
             return redirect()->back()->with('success', 'Hóspede cadastrado com sucesso!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erro ao cadastrar hóspede: ' . $e->getMessage());
@@ -207,4 +214,6 @@ class HospedeController extends Controller
             return redirect()->back()->with('error', 'Erro ao realizar check-out: ' . $e->getMessage());
         }
     }
+
+    
 }

@@ -89,7 +89,14 @@ canvas.chart-canvas {
     justify-content: center;
     font-size: 1.5rem;
 }
-
+.chart {
+    height: 300px !important; /* Altura fixa para o contêiner */
+    width: 100%; /* Garante que o gráfico ocupe toda a largura */
+}
+.chart-canvas {
+    max-height: 300px !important; /* Limita a altura do canvas */
+    width: 100% !important; /* Garante responsividade na largura */
+}
 .card-hover:hover {
     transform: translateY(-5px);
     transition: transform 0.3s ease;
@@ -115,7 +122,8 @@ canvas.chart-canvas {
     padding: 0.35em 0.65em;
     font-size: 0.75em;
     font-weight: 600;
-}.chart-canvas {
+}
+.chart-canvas {
     width: 100% !important;
     display: block;
 }
@@ -164,7 +172,7 @@ canvas.chart-canvas {
 
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
     background-color: #e5e7eb !important; /* gray-200 */
-    color: #111827 !important; /* gray-900 */
+    color: #5881da !important; /* gray-900 */
     cursor: pointer;
 }
 
@@ -224,6 +232,33 @@ canvas.chart-canvas {
     padding: 1rem;
     vertical-align: middle;
     font-size: 0.85rem;
+}
+
+/* Estilo para botões de ícone */
+.btn-icon-only {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+/* Efeito hover nos botões */
+.btn-outline-info:hover { background-color: rgba(23, 162, 184, 0.1); }
+.btn-outline-primary:hover { background-color: rgba(13, 110, 253, 0.1); }
+.btn-outline-danger:hover { background-color: rgba(220, 53, 69, 0.1); }
+.btn-outline-success:hover { background-color: rgba(25, 135, 84, 0.1); }
+.btn-outline-dark:hover { background-color: rgba(33, 37, 41, 0.1); }
+
+/* Ajuste para modais em mobile */
+@media (max-width: 768px) {
+    .modal-body .row {
+        flex-direction: column;
+    }
+    .modal-body .col-md-6 {
+        width: 100%;
+    }
 }
 
 .badge {
@@ -318,4 +353,135 @@ canvas.chart-canvas {
     .actions-container {
         justify-content: flex-end !important;
     }
+}
+/* Estilo para o avatar do usuário */
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.avatar-initial {
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Cores para diferentes cargos */
+.bg-gradient-admin { background: linear-gradient(135deg, #dc3545, #a71d2a); }
+.bg-gradient-gerente { background: linear-gradient(135deg, #0d6efd, #0b5ed7); }
+.bg-gradient-recepcionista { background: linear-gradient(135deg, #6c757d, #5c636a); }
+
+/* Estilos personalizados */
+.hospede {
+    white-space: nowrap;
+    
+}
+
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+}
+
+.avatar-initial {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.btn-link {
+    transition: all 0.2s;
+    opacity: 0.7;
+}
+
+.btn-link:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .hospede {
+        font-size: 0.8rem;
+    }
+    
+    .avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+    }
+    
+    .badge {
+        font-size: 0.7rem;
+        padding: 0.25em 0.4em;
+    }
+}
+
+
+/* Estilo para o scroll aparecer apenas quando necessário */
+#sidenav-collapse-main {
+    max-height: calc(100vh - 150px); /* Ajusta a altura máxima para evitar overflow */
+    overflow-y: auto; /* Scroll aparece apenas quando necessário */
+    scrollbar-width: thin; /* Para navegadores que suportam (Firefox) */
+    scrollbar-color: #888 #f1f1f1; /* Cor do scroll */
+}
+
+/* Estiliza a barra de rolagem para navegadores baseados em Webkit (Chrome, Safari) */
+#sidenav-collapse-main::-webkit-scrollbar {
+    width: 8px;
+}
+
+#sidenav-collapse-main::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#sidenav-collapse-main::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+#sidenav-collapse-main::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Estilo para transição suave do submenu */
+.dropdown-menu {
+    transition: all 0.3s ease-in-out; /* Transição para todas as propriedades */
+    max-height: 0; /* Inicialmente escondido */
+    opacity: 0; /* Inicialmente invisível */
+    overflow: hidden; /* Esconde o conteúdo enquanto a altura é 0 */
+    display: block; /* Necessário para a transição funcionar */
+}
+
+.dropdown-menu.show {
+    max-height: 300px; /* Altura máxima do submenu (ajuste conforme necessário) */
+    opacity: 1; /* Torna visível */
+}
+
+/* Estilo para o item ativo */
+.nav-link.active {
+    background-color: #f8f9fa; /* Cor de fundo para o item ativo */
+    color: #007bff !important; /* Cor do texto */
+    font-weight: bold; /* Negrito para destacar */
+}
+
+.nav-link.active .icon i {
+    color: #007bff !important; /* Cor do ícone */
+    opacity: 1 !important; /* Remove a opacidade do ícone */
 }

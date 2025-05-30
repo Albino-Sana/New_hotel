@@ -61,7 +61,7 @@
                 <form method="POST" action="{{ route('logout') }}">
                   @csrf
                   <button type="submit" class="dropdown-item text-danger">
-                    <i class="bi bi-box-arrow-right me-2"></i> Sair
+                    <i class="bi bi-box-arrow-right me-2"></i> Terminar sessão
                   </button>
                 </form>
               </li>

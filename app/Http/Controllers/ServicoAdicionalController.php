@@ -11,12 +11,11 @@ class ServicoAdicionalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $servicos = ServicoAdicional::all();
-        return view('servicos_extras.index', compact('servicos'));
-    }
-
+public function index()
+{
+    $servicos = ServicoAdicional::orderBy('nome', 'asc')->get();
+    return view('servicos_extras.index', compact('servicos'));
+}
     /**
      * Show the form for creating a new resource.
      */
