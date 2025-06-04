@@ -383,7 +383,6 @@
                 </div>
             </div>
 
-
             <!-- Script para preencher campos -->
             <script>
                 document.getElementById('reserva_id').addEventListener('change', function() {

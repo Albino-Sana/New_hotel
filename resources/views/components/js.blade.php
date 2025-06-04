@@ -296,3 +296,22 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+@if(session('fatura_prompt'))
+<script>
+    Swal.fire({
+        title: 'Pagamento registrado!',
+        text: 'Deseja gerar a fatura agora?',
+        icon: 'success',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, gerar',
+        cancelButtonText: 'Não',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.open("{{ route('pagamentos.fatura', session('fatura_prompt')) }}", "_blank");
+        }
+    });
+</script>
+@endif
+
+

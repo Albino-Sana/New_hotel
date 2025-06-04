@@ -11,6 +11,9 @@ use App\Models\Estadia;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+
+
 
 class HospedeController extends Controller
 {
@@ -168,52 +171,53 @@ class HospedeController extends Controller
         }
     }
 
-    public function checkout(Request $request, $id)
-    {
-        $request->validate([
-            'servicos' => 'nullable|array',
-            'servicos.*' => 'exists:servicos_adicionais,id',
+public function checkout(Request $request, $id)
+{
+    $request->validate([
+        'servicos' => 'nullable|array',
+        'servicos.*' => 'exists:servicos_adicionais,id',
+    ]);
+
+    try {
+        $hospede = Hospede::with('quarto')->findOrFail($id);
+
+        if ($hospede->status === 'finalizado') {
+            return back()->with('error', 'Hóspede já realizou check-out.');
+        }
+
+        $valorHospedagem = $hospede->valor_a_pagar ?? 0;
+        $valorServicos = 0;
+        $servicosNomes = [];
+
+        if ($request->has('servicos')) {
+            $servicos = ServicoAdicional::whereIn('id', $request->servicos)->get();
+            $valorServicos = $servicos->sum('preco');
+            $servicosNomes = $servicos->pluck('nome')->toArray();
+            $hospede->servicosAdicionais()->sync($request->servicos);
+        }
+
+        $valorTotal = $valorHospedagem + $valorServicos;
+
+        CheckoutHospede::create([
+            'hospede_id' => $hospede->id,
+            'data_checkout' => now(),
+            'valor_hospedagem' => $valorHospedagem,
+            'valor_servicos' => $valorServicos > 0 ? $valorServicos : null,
+            'valor_total' => $valorTotal,
+            'servicos_adicionais' => !empty($servicosNomes) ? json_encode($servicosNomes) : null,
         ]);
 
-        try {
-            $hospede = Hospede::with('quarto')->findOrFail($id);
+        $hospede->update(['status' => 'finalizado']);
 
-            if ($hospede->status === 'finalizado') {
-                return back()->with('error', 'Hóspede já realizou check-out.');
-            }
-
-            $valorHospedagem = $hospede->valor_a_pagar;
-            $valorServicos = 0;
-            $servicosNomes = [];
-
-            if ($request->has('servicos')) {
-                $servicos = ServicoAdicional::whereIn('id', $request->servicos)->get();
-                $valorServicos = $servicos->sum('preco');
-                $servicosNomes = $servicos->pluck('nome')->toArray();
-                $hospede->servicosAdicionais()->sync($request->servicos);
-            }
-
-            $valorTotal = $valorHospedagem + $valorServicos;
-
-            CheckoutHospede::create([
-                'hospede_id' => $hospede->id,
-                'data_checkout' => now(),
-                'valor_hospedagem' => $valorHospedagem,
-                'valor_servicos' => $valorServicos > 0 ? $valorServicos : null,
-                'valor_total' => $valorTotal,
-                'servicos_adicionais' => !empty($servicosNomes) ? $servicosNomes : null,
-            ]);
-
-            $hospede->update(['status' => 'finalizado']);
-            if ($hospede->quarto) {
-                $hospede->quarto->update(['status' => 'Disponível']);
-            }
-
-            return redirect()->back()->with('success', 'Check-out realizado com sucesso!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Erro ao realizar check-out: ' . $e->getMessage());
+        if ($hospede->quarto) {
+            $hospede->quarto->update(['status' => 'disponível']);
         }
-    }
 
+        return redirect()->back()->with('success', 'Check-out realizado com sucesso!');
+    } catch (\Exception $e) {
+        Log::error('Erro ao realizar check-out: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'Erro ao realizar check-out: ' . $e->getMessage());
+    }
+}
     
 }

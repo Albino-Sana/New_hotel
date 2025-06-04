@@ -32,6 +32,10 @@ class Checkin extends Model
         return $this->belongsTo(Quarto::class);
     }
 
+    public function pagamento()
+{
+    return $this->hasOne(Pagamento::class);
+}
     public function valor_total()
     {
         return $this->quarto->preco_diaria * $this->diasHospedagem();

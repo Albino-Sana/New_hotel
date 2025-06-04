@@ -43,10 +43,14 @@ class Reserva extends Model
         return $this->belongsTo(Quarto::class);
     }
 
-public function user()
-{
-    return $this->belongsTo(User::class, 'user_id'); // ou outro nome da coluna se não for 'user_id'
-}
+    public function pagamento()
+    {
+        return $this->hasOne(Pagamento::class);
+    }
 
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id'); // ou outro nome da coluna se não for 'user_id'
+    }
 }

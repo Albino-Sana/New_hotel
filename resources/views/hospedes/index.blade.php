@@ -94,9 +94,9 @@
 
                                             <td>
                                                 <span class="badge bg-gradient-{{
-                    $hospede->status === 'hospedado' ? 'info' : 
-                    ($hospede->status === 'finalizado' ? 'success' : 'secondary')
-                }}">
+                                                            $hospede->status === 'hospedado' ? 'info' : 
+                                                            ($hospede->status === 'finalizado' ? 'success' : 'secondary')
+                                                        }}">
                                                     {{ ucfirst($hospede->status) }}
                                                 </span>
                                             </td>

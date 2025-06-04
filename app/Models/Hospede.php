@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Hospede extends Model
 {
     use HasFactory;
-
+  protected $table = 'hospedes';
     protected $fillable = [
     
         'hospede_id',
@@ -32,6 +32,11 @@ class Hospede extends Model
     {
         return $this->belongsTo(Quarto::class);
     }
+
+    public function pagamento()
+{
+    return $this->hasOne(Pagamento::class);
+}
 
     public function reserva()
     {

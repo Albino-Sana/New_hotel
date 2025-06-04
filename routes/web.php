@@ -17,6 +17,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\CorrenteServicoController;
+use App\Http\Controllers\PagamentoController;
 use App\Models\TipoQuarto;
 
 Route::get('/', function () {
@@ -142,21 +143,33 @@ Route::middleware('can:gerenciar-reservas')->group(function () {
     Route::delete('/sys/hotelaria/checkouts/741/remover-checkout', [CheckoutController::class, 'destroy'])->name('checkouts.destroy');
 
     // Hóspedes
-    Route::get('/sys/hotelaria/hospedes/963/listar-hospedes', [HospedeController::class, 'index'])->name('hospedes.index');
+    Route::get('/sys/hotelaria/hospedes/listar-hospedes', [HospedeController::class, 'index'])->name('hospedes.index');
     Route::get('/sys/hotelaria/hospedes/147/criar-hospede', [HospedeController::class, 'create'])->name('hospedes.create');
     Route::post('/sys/hotelaria/hospedes/258/salvar-hospede', [HospedeController::class, 'store'])->name('hospedes.store');
     Route::get('/sys/hotelaria/hospedes/369/editar-hospede', [HospedeController::class, 'edit'])->name('hospedes.edit');
     Route::put('/sys/hotelaria/hospedes/741/atualizar-hospede', [HospedeController::class, 'update'])->name('hospedes.update');
     Route::delete('/sys/hotelaria/hospedes/852/remover-hospede', [HospedeController::class, 'destroy'])->name('hospedes.destroy');
-    Route::post('/sys/hotelaria/hospedes/963/checkout', [HospedeController::class, 'checkout'])->name('hospedes.checkout');
+  Route::post('/sys/hotelaria/hospedes/{id}/checkout', [HospedeController::class, 'checkout'])->name('hospedes.checkout');
 
     // Relatórios
     Route::get('/sys/hotelaria/relatorios/369/servicos-extras', [RelatorioController::class, 'servicosExtras'])->name('relatorios.servicos-extras');
     Route::get('/sys/hotelaria/relatorios/741/dados-servicos-extras', [RelatorioController::class, 'dadosServicosExtras'])->name('relatorios.dados-servicos-extras');
+    
+    // Pagamentos
+    Route::get('/sys/hotelaria/pagamentos/123/listar-pagamentos', [PagamentoController::class, 'index'])->name('pagamentos.index');
+    Route::get('/sys/hotelaria/pagamentos/456/criar-pagamento/{reservaId}', [PagamentoController::class, 'create'])->name('pagamentos.create');
+    Route::post('/sys/hotelaria/pagamentos/789/processar-pagamento', [PagamentoController::class, 'store'])->name('pagamentos.store');
+    Route::get('/sys/hotelaria/pagamentos/234/editar-pagamento/{id}', [PagamentoController::class, 'edit'])->name('pagamentos.edit');
+    Route::put('/sys/hotelaria/pagamentos/567/atualizar-pagamento/{id}', [PagamentoController::class, 'update'])->name('pagamentos.update');
+    Route::delete('/sys/hotelaria/pagamentos/890/remover-pagamento/{id}', [PagamentoController::class, 'destroy'])->name('pagamentos.destroy');
+    Route::get('/valor/checkin/{id}', [PagamentoController::class, 'valorPorCheckin']);
+    Route::get('/valor/hospede/{id}', [PagamentoController::class, 'valorPorHospede']);
+    Route::get('/pagamentos/{id}/fatura', [PagamentoController::class, 'fatura'])->name('pagamentos.fatura');
+
 
     Route::get('/api/tipo-quarto/{id}', function ($id) {
         $tipo = TipoQuarto::find($id);
-        
+
         if (!$tipo) {
             return response()->json(['error' => 'Tipo de quarto não encontrado'], 404);
         }
@@ -204,13 +217,14 @@ Route::middleware('can:recepcionista-only')->group(function () {
     Route::delete('/sys/hotelaria/checkouts/741/remover-checkout', [CheckoutController::class, 'destroy'])->name('checkouts.destroy');
 
     // Hóspedes
-    Route::get('/sys/hotelaria/hospedes/963/listar-hospedes', [HospedeController::class, 'index'])->name('hospedes.index');
+    Route::get('/sys/hotelaria/hospedes/listar-hospedes', [HospedeController::class, 'index'])->name('hospedes.index');
     Route::get('/sys/hotelaria/hospedes/147/criar-hospede', [HospedeController::class, 'create'])->name('hospedes.create');
     Route::post('/sys/hotelaria/hospedes/258/salvar-hospede', [HospedeController::class, 'store'])->name('hospedes.store');
     Route::get('/sys/hotelaria/hospedes/369/editar-hospede', [HospedeController::class, 'edit'])->name('hospedes.edit');
     Route::put('/sys/hotelaria/hospedes/741/atualizar-hospede', [HospedeController::class, 'update'])->name('hospedes.update');
     Route::delete('/sys/hotelaria/hospedes/852/remover-hospede', [HospedeController::class, 'destroy'])->name('hospedes.destroy');
-    Route::post('/sys/hotelaria/hospedes/963/checkout', [HospedeController::class, 'checkout'])->name('hospedes.checkout');
+   Route::post('/sys/hotelaria/hospedes/{id}/checkout', [HospedeController::class, 'checkout'])->name('hospedes.checkout');
+
 });
 
 require __DIR__ . '/auth.php';

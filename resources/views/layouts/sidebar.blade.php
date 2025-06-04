@@ -11,10 +11,10 @@ $tipoUser = Auth::user()->tipo ?? null;
 <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4" id="sidenav-main">
     <div class="sidenav-header py-3">
         <a class="navbar-brand m-0 d-flex justify-content-center align-items-center" href="#">
-            <img src="{{ asset('assets/img/dat-sys-3D.png') }}" 
-                 class="img-fluid" 
-                 style="max-width: 150px; max-height: 50px; width: auto; height: auto; object-fit: contain;" 
-                 alt="Logo DAT-SYS">
+            <img src="{{ asset('assets/img/dat-sys-3D.png') }}"
+                class="img-fluid"
+                style="max-width: 150px; max-height: 50px; width: auto; height: auto; object-fit: contain;"
+                alt="Logo DAT-SYS">
         </a>
     </div>
 
@@ -107,15 +107,6 @@ $tipoUser = Auth::user()->tipo ?? null;
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="../pages/sign-up.html">
-                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="fas fa-credit-card text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Pagamentos</span>
-                </a>
-            </li>
-
             <x-dropdown align="right" width="48">
                 <x-slot name="trigger">
                     <a class="nav-link d-flex align-items-center {{ request()->routeIs('relatorios.*') ? 'active' : '' }}" href="#" role="button">
@@ -141,8 +132,25 @@ $tipoUser = Auth::user()->tipo ?? null;
                     </a>
                 </x-slot>
             </x-dropdown>
+
+                        <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('pagamentos.*') ? 'active' : '' }}" href="{{ route('pagamentos.index') }}">
+                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-credit-card text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Pagamentos</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('documentos.*') ? 'active' : '' }}" href="#">
+                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-file-alt text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Documentos</span>
+                </a>
+            </li>
             @endif
         </ul>
     </div>
 </aside>
-

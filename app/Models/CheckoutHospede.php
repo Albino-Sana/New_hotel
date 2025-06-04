@@ -24,6 +24,10 @@ class CheckoutHospede extends Model
     {
         return $this->belongsTo(Hospede::class);
     }
+public function pagamento()
+{
+    return $this->hasOne(Pagamento::class);
+}
 
     public function checkout()
     {
