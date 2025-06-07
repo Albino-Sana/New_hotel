@@ -168,7 +168,7 @@
     <div class="container">
         <div class="header">
             <div class="logo">
-                <h1>HOTELARIA</h1>
+                <h1>{{ $empresa->nome_empresa ?? 'HOTELARIA' }}</h1>
                 <p>Sistema de Gestão Hoteleira</p>
             </div>
             <div class="invoice-info">
@@ -180,10 +180,11 @@
         
         <div class="company-info">
             <div class="info-title">Dados do Estabelecimento</div>
-            <div><strong>Nome:</strong> Hotel Exemplo</div>
-            <div><strong>Endereço:</strong> Av. Principal, 123</div>
-            <div><strong>Telefone:</strong> 222 333 444 | <strong>E-mail:</strong> info@hotelexemplo.com</div>
-            <div><strong>Contribuinte:</strong> 123456789</div>
+            <div><strong>Nome:</strong> {{ $empresa->nome_empresa ?? 'Não definido' }}</div>
+            <div><strong>Endereço:</strong> {{ $empresa->endereco_empresa ?? 'Não definido' }}, {{ $empresa->numero_edificio ?? '' }} {{ $empresa->nome_rua ?? '' }}, {{ $empresa->cidade ?? '' }}, {{ $empresa->provincia ?? '' }}</div>
+            <div><strong>Telefone:</strong> {{ $empresa->telefone ?? 'N/D' }} | <strong>E-mail:</strong> {{ $empresa->email ?? 'N/D' }}</div>
+            <div><strong>Contribuinte (NIF):</strong> {{ $empresa->numero_registo_fiscal ?? 'N/D' }}</div>
+            <div><strong>Número de Validação do Software:</strong> {{ $empresa->numero_validacao_software ?? 'N/D' }}</div>
         </div>
         
         <div class="client-info">
@@ -215,7 +216,7 @@
                     <td>{{ number_format($pagamento->valor, 2, ',', '.') }} KZ</td>
                     <td>{{ \Carbon\Carbon::parse($pagamento->data_pagamento)->format('d/m/Y H:i') }}</td>
                     <td>{{ $pagamento->metodo_pagamento }}</td>
-                    <td>{{ $pagamento->status_pagamento ?? 'confirmado' }}</td>
+                    <td>{{ ucfirst($pagamento->status_pagamento ?? 'confirmado') }}</td>
                 </tr>
             </tbody>
         </table>
@@ -236,6 +237,7 @@
             @if($pagamento->descricao)
                 <p><strong>Observações:</strong> {{ $pagamento->descricao }}</p>
             @endif
+            <p><strong>Comentário:</strong> {{ $empresa->comentario_cabecalho ?? 'Obrigado pela sua preferência!' }}</p>
         </div>
         
         <div class="signature-area">
@@ -249,7 +251,7 @@
         </div>
         
         <div class="footer">
-            <p>Processado por Sistema de Hotelaria</p>
+            <p>Processado por {{ $empresa->id_produto ?? 'Sistema de Hotelaria' }} - Versão {{ $empresa->versao_produto ?? 'N/D' }}</p>
             <p>Este documento é gerado eletronicamente</p>
         </div>
     </div>

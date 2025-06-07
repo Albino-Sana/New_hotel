@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $('.table').DataTable({
             select: true,
             responsive: true,
-            ordering: false,
+          ordering: false,
             language: {
                 url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
             },

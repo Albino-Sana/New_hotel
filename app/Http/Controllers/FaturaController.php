@@ -5,16 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\Fatura;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class FaturaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
-    }
+public function index()
+{
+    $faturas = Fatura::with('checkin')->latest()->get();
+    return view('faturas.index', compact('faturas'));
+}
+
+public function gerarPdf($id)
+{
+    $fatura = Fatura::findOrFail($id);
+    $pdf = Pdf::loadView('faturas.pdf', compact('fatura')); // View faturas/pdf.blade.php
+    return $pdf->download("fatura_{$fatura->numero}.pdf");
+}
 
     /**
      * Show the form for creating a new resource.

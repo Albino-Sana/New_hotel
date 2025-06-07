@@ -9,7 +9,12 @@ use App\Models\Quarto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\ServicoAdicional; // <- nova linha
+use App\Models\ServicoAdicional;
+use App\Models\Fatura;
+use App\Models\Recibo;
+use App\Mail\ReciboFaturaMail;
+use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class CheckinController extends Controller
 {
@@ -35,9 +40,9 @@ class CheckinController extends Controller
         ));
     }
 
-
 public function store(Request $request)
 {
+    // 1. Validação dos dados de entrada
     $request->validate([
         'reserva_id' => 'required|exists:reservas,id',
         'quarto_id' => 'required|exists:quartos,id',
@@ -47,66 +52,108 @@ public function store(Request $request)
         'num_pessoas' => 'required|integer|min:1',
     ]);
 
-    try {
-        DB::beginTransaction();
+try {
+    DB::beginTransaction();
 
-        $checkin = Checkin::create([
-            'reserva_id' => $request->reserva_id,
-            'quarto_id' => $request->quarto_id,
-            'numero_quarto' => $request->numero_quarto, // campo incluído
-            'data_entrada' => $request->data_entrada,
-            'data_saida' => $request->data_saida,
-            'num_pessoas' => $request->num_pessoas,
-            'status' => 'hospedado',
-        ]);
+    $reserva = Reserva::findOrFail($request->reserva_id);
 
-        Quarto::where('id', $request->quarto_id)->update(['status' => 'Ocupado']);
-        Reserva::where('id', $request->reserva_id)->update(['status' => 'hospedado']);
-
-        DB::commit();
-
-        return redirect()->back()->with('success', 'Check-in realizado com sucesso!');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()->with('error', 'Erro ao salvar check-in: ' . $e->getMessage());
-    }
-}
-
-
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'data_entrada' => 'required|date',
-        'data_saida' => 'required|date|after_or_equal:data_entrada',
-        'num_pessoas' => 'required|integer|min:1',
-        'numero_quarto' => 'required|string|max:255',
-        'status' => 'required|string',
+    $checkin = Checkin::create([
+        'reserva_id' => $request->reserva_id,
+        'quarto_id' => $request->quarto_id,
+        'numero_quarto' => $request->numero_quarto,
+        'data_entrada' => $request->data_entrada,
+        'data_saida' => $request->data_saida,
+        'num_pessoas' => $request->num_pessoas,
+        'status' => 'hospedado',
     ]);
 
-    try {
-        DB::beginTransaction();
+    Quarto::where('id', $request->quarto_id)->update(['status' => 'Ocupado']);
+    Reserva::where('id', $request->reserva_id)->update(['status' => 'hospedado']);
 
-        $checkin = Checkin::findOrFail($id);
-        $checkin->update([
-            'data_entrada' => $request->data_entrada,
-            'data_saida' => $request->data_saida,
-            'num_pessoas' => $request->num_pessoas,
-            'numero_quarto' => $request->numero_quarto, // campo incluído
-            'status' => $request->status,
+    $numeroFormatado = str_pad(Fatura::max('id') + 1, 5, '0', STR_PAD_LEFT);
+
+    $fatura = Fatura::create([
+        'tipo_documento' => 'FT',
+        'serie' => 'A01',
+        'numero' => $numeroFormatado,
+        'data_emissao' => Carbon::now()->toDateString(),
+        'total' => floatval($reserva->valor_total ?? 0),
+        'valor_entregue' => floatval($reserva->valor_total ?? 0),
+        'troco' => 0,
+
+        'nome_cliente' => $reserva->cliente_nome,
+        'nif' => $reserva->cliente_nif ?? '999999990',
+        'telefone' => $reserva->cliente_telefone ?? null,
+
+        'estado_documento' => 'N',
+        'hash' => null,
+        'hash_control' => null,
+
+        'regime_autofaturacao' => false,
+        'regime_iva_caixa' => false,
+        'emitido_terceiros' => false,
+
+        'metodo_pagamento' => 'Dinheiro',
+        'codigo_cae' => '55101',
+        'mesa_id' => null,
+        'servico_id' => $checkin->id,
+    ]);
+
+    if (!empty($reserva->cliente_email)) {
+        Mail::to($reserva->cliente_email)->send(new ReciboFaturaMail($fatura));
+    }
+
+    DB::commit();
+
+    // Redireciona para a tela anterior e passa o link do PDF
+    return redirect()->back()->with([
+        'success' => 'Check-in realizado com sucesso!',
+        'fatura_pdf_id' => $fatura->id
+    ]);
+} catch (\Exception $e) {
+    DB::rollBack();
+    return redirect()->back()->with('error', 'Erro ao salvar check-in: ' . $e->getMessage());
+}
+
+
+}
+
+
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'data_entrada' => 'required|date',
+            'data_saida' => 'required|date|after_or_equal:data_entrada',
+            'num_pessoas' => 'required|integer|min:1',
+            'numero_quarto' => 'required|string|max:255',
+            'status' => 'required|string',
         ]);
 
-        $quartoStatus = $request->status === 'hospedado' ? 'ocupado' : 'disponível';
-        Quarto::where('id', $checkin->quarto_id)->update(['status' => $quartoStatus]);
-        Reserva::where('id', $checkin->reserva_id)->update(['status' => $request->status]);
+        try {
+            DB::beginTransaction();
 
-        DB::commit();
+            $checkin = Checkin::findOrFail($id);
+            $checkin->update([
+                'data_entrada' => $request->data_entrada,
+                'data_saida' => $request->data_saida,
+                'num_pessoas' => $request->num_pessoas,
+                'numero_quarto' => $request->numero_quarto, // campo incluído
+                'status' => $request->status,
+            ]);
 
-        return redirect()->back()->with('success', 'Check-in atualizado com sucesso!');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()->with('error', 'Erro ao atualizar check-in: ' . $e->getMessage());
+            $quartoStatus = $request->status === 'hospedado' ? 'ocupado' : 'disponível';
+            Quarto::where('id', $checkin->quarto_id)->update(['status' => $quartoStatus]);
+            Reserva::where('id', $checkin->reserva_id)->update(['status' => $request->status]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Check-in atualizado com sucesso!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Erro ao atualizar check-in: ' . $e->getMessage());
+        }
     }
-}
 
     public function dadosReserva($id)
     {

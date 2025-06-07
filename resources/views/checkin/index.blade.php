@@ -358,6 +358,14 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="criar_fatura" id="criar_fatura" value="1" checked>
+                                            <label class="form-check-label text-primary fw-medium" for="criar_fatura">
+                                                Gerar fatura automaticamente após o check-in
+                                            </label>
+                                        </div>
+
                                     </div>
                                 </div>
 
@@ -374,7 +382,7 @@
                                 <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
                                     <i class="fas fa-times me-2"></i>Cancelar
                                 </button>
-                                <button type="button" class="btn btn-success btn-checkin rounded-pill px-4 shadow-sm">
+                                <button type="submit" class="btn btn-success btn-checkin rounded-pill px-4 shadow-sm">
                                     <i class="fas fa-check-circle me-2"></i>Confirmar Check-in
                                 </button>
                             </div>
@@ -411,6 +419,16 @@
     @include('layouts.customise')
     <!--   Core JS Files   -->
     @include('components.js')
+
+    @if (session('fatura_id'))
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                window.open("{{ route('faturas.pdf', session('fatura_id')) }}", '_blank');
+            }, 1000); // aguarda 1 segundo para o SweetAlert aparecer primeiro
+        });
+    </script>
+    @endif
 
 </body>
 

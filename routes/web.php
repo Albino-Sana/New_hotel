@@ -19,6 +19,18 @@ use App\Http\Controllers\PosController;
 use App\Http\Controllers\CorrenteServicoController;
 use App\Http\Controllers\PagamentoController;
 use App\Models\TipoQuarto;
+use App\Http\Controllers\FaturaController;
+use App\Http\Controllers\ReciboController;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Fatura;
+use App\Models\Reserva;
+use App\Models\Empresa;
+use App\Http\Controllers\EmpresaController;
+use App\Models\Pagamento;
+
+use App\Http\Controllers\PagamentoMetodoController;
+use App\Models\PagamentoMetodo;
+
 
 Route::get('/', function () {
     return view('auth.login');
@@ -35,6 +47,16 @@ Route::middleware(['auth'])->group(function () {
 
     // 🔒 Rotas exclusivas para Admin
     Route::middleware('can:admin-only')->group(function () {
+        Route::get('/hotel', [EmpresaController::class, 'index'])->name('hotel.index');
+        Route::put('/hotel', [EmpresaController::class, 'store'])->name('hotel.store');
+        Route::post('/pagamentos', [PagamentoController::class, 'store'])->name('pagamentos.store');
+        Route::delete('/pagamentos/{id}', [PagamentoController::class, 'destroy'])->name('pagamentos.destroy');
+        Route::get('/empresa', [EmpresaController::class, 'index'])->name('empresa.index');
+        Route::put('/empresa', [EmpresaController::class, 'store'])->name('empresa.store');
+
+        Route::post('/pagamentos-metodos', [PagamentoMetodoController::class, 'store'])->name('pagamentos-metodos.store');
+        Route::delete('/pagamentos-metodos/{id}', [PagamentoMetodoController::class, 'destroy'])->name('pagamentos-metodos.destroy');
+
         // Usuários
         Route::get('/sys/hotelaria/usuarios/789/listar-usuarios', [UserController::class, 'index'])->name('usuarios.index');
         Route::get('/sys/hotelaria/usuarios/234/criar-usuario', [UserController::class, 'create'])->name('usuarios.create');
@@ -97,6 +119,10 @@ Route::middleware(['auth'])->group(function () {
         })->name('pos2');
         Route::get('/sys/hotelaria/config/456/configuracoes', [HotelConfigController::class, 'index'])->name('hotel.config');
     });
+
+    //Fatura
+    Route::get('/faturas', [FaturaController::class, 'index'])->name('faturas.index');
+    Route::get('/fatura/{id}/pdf', [FaturaController::class, 'gerarPdf'])->name('faturas.pdf');
 });
 
 // 🔄 Rotas para gestão de reservas (Admin + Recepcionista)
@@ -116,6 +142,12 @@ Route::middleware('can:gerenciar-reservas')->group(function () {
         return view('POS.pos2');
     })->name('pos2');
 
+    Route::get('/empresa', [EmpresaController::class, 'index'])->name('empresa.index');
+    Route::put('/empresa', [EmpresaController::class, 'store'])->name('empresa.store');
+
+    Route::post('/pagamentos-metodos', [PagamentoMetodoController::class, 'store'])->name('pagamentos-metodos.store');
+    Route::delete('/pagamentos-metodos/{id}', [PagamentoMetodoController::class, 'destroy'])->name('pagamentos-metodos.destroy');
+
     // Reservas
     Route::get('/sys/hotelaria/reservas/147/listar-reservas', [ReservaController::class, 'index'])->name('reservas.index');
     Route::get('/sys/hotelaria/reservas/258/criar-reserva', [ReservaController::class, 'create'])->name('reservas.create');
@@ -131,7 +163,7 @@ Route::middleware('can:gerenciar-reservas')->group(function () {
     Route::post('/sys/hotelaria/checkins/852/salvar-checkin', [CheckinController::class, 'store'])->name('checkins.store');
     Route::get('/sys/hotelaria/checkins/963/editar-checkin', [CheckinController::class, 'edit'])->name('checkins.edit');
     Route::put('/sys/hotelaria/checkins/147/atualizar-checkin', [CheckinController::class, 'update'])->name('checkins.update');
-    Route::delete('/sys/hotelaria/checkins/258/remover-checkin', [CheckinController::class, 'destroy'])->name('checkins.destroy');
+    Route::delete('/sys/hotelaria/checkins/remover-checkin/{id}', [CheckinController::class, 'destroy'])->name('checkins.destroy');
     Route::get('/sys/hotelaria/checkins/369/dados-reserva', [CheckinController::class, 'dadosReserva'])->name('checkins.dados-reserva');
 
     // Checkouts
@@ -149,12 +181,12 @@ Route::middleware('can:gerenciar-reservas')->group(function () {
     Route::get('/sys/hotelaria/hospedes/369/editar-hospede', [HospedeController::class, 'edit'])->name('hospedes.edit');
     Route::put('/sys/hotelaria/hospedes/741/atualizar-hospede', [HospedeController::class, 'update'])->name('hospedes.update');
     Route::delete('/sys/hotelaria/hospedes/852/remover-hospede', [HospedeController::class, 'destroy'])->name('hospedes.destroy');
-  Route::post('/sys/hotelaria/hospedes/{id}/checkout', [HospedeController::class, 'checkout'])->name('hospedes.checkout');
+    Route::post('/sys/hotelaria/hospedes/{id}/checkout', [HospedeController::class, 'checkout'])->name('hospedes.checkout');
 
     // Relatórios
     Route::get('/sys/hotelaria/relatorios/369/servicos-extras', [RelatorioController::class, 'servicosExtras'])->name('relatorios.servicos-extras');
     Route::get('/sys/hotelaria/relatorios/741/dados-servicos-extras', [RelatorioController::class, 'dadosServicosExtras'])->name('relatorios.dados-servicos-extras');
-    
+
     // Pagamentos
     Route::get('/sys/hotelaria/pagamentos/123/listar-pagamentos', [PagamentoController::class, 'index'])->name('pagamentos.index');
     Route::get('/sys/hotelaria/pagamentos/456/criar-pagamento/{reservaId}', [PagamentoController::class, 'create'])->name('pagamentos.create');
@@ -166,6 +198,10 @@ Route::middleware('can:gerenciar-reservas')->group(function () {
     Route::get('/valor/hospede/{id}', [PagamentoController::class, 'valorPorHospede']);
     Route::get('/pagamentos/{id}/fatura', [PagamentoController::class, 'fatura'])->name('pagamentos.fatura');
 
+
+    //Fatura
+    Route::get('/faturas', [FaturaController::class, 'index'])->name('faturas.index');
+    Route::get('/fatura/{id}/pdf', [FaturaController::class, 'gerarPdf'])->name('faturas.pdf');
 
     Route::get('/api/tipo-quarto/{id}', function ($id) {
         $tipo = TipoQuarto::find($id);
@@ -188,7 +224,13 @@ Route::middleware('can:recepcionista-only')->group(function () {
     Route::get('/relatorios/relatorio-reservas-cancelamentos-pdf', [RelatorioController::class, 'relatorioReservasCancelamentosPDF'])->name('relatorios.relatorio-reservas-cancelamentos-pdf');
     Route::get('/relatorios/relatorio-ocupacao-pdf', [RelatorioController::class, 'relatorioOcupacaoPDF'])->name('relatorios.relatorio-ocupacao-pdf');
     Route::get('/relatorios/relatorio-servicos-extras-pdf', [RelatorioController::class, 'relatorioServicosExtrasPDF'])->name('relatorio.servicos.extras');
+    Route::get('/hotel', [EmpresaController::class, 'index'])->name('hotel.index');
+    Route::put('/hotel', [EmpresaController::class, 'store'])->name('hotel.store');
+    Route::post('/pagamentos', [PagamentoController::class, 'store'])->name('pagamentos.store');
+    Route::delete('/pagamentos/{id}', [PagamentoController::class, 'destroy'])->name('pagamentos.destroy');
 
+    Route::post('/pagamentos-metodos', [PagamentoMetodoController::class, 'store'])->name('pagamentos-metodos.store');
+    Route::delete('/pagamentos-metodos/{id}', [PagamentoMetodoController::class, 'destroy'])->name('pagamentos-metodos.destroy');
     // Reservas
     Route::get('/sys/hotelaria/reservas/147/listar-reservas', [ReservaController::class, 'index'])->name('reservas.index');
     Route::get('/sys/hotelaria/reservas/258/criar-reserva', [ReservaController::class, 'create'])->name('reservas.create');
@@ -205,7 +247,7 @@ Route::middleware('can:recepcionista-only')->group(function () {
     Route::post('/sys/hotelaria/checkins/852/salvar-checkin', [CheckinController::class, 'store'])->name('checkins.store');
     Route::get('/sys/hotelaria/checkins/963/editar-checkin', [CheckinController::class, 'edit'])->name('checkins.edit');
     Route::put('/sys/hotelaria/checkins/147/atualizar-checkin', [CheckinController::class, 'update'])->name('checkins.update');
-    Route::delete('/sys/hotelaria/checkins/258/remover-checkin', [CheckinController::class, 'destroy'])->name('checkins.destroy');
+    Route::delete('/sys/hotelaria/checkins/remover-checkin/{id}', [CheckinController::class, 'destroy'])->name('checkins.destroy');
     Route::get('/sys/hotelaria/checkins/369/dados-reserva', [CheckinController::class, 'dadosReserva'])->name('checkins.dados-reserva');
 
     // Checkouts
@@ -223,8 +265,13 @@ Route::middleware('can:recepcionista-only')->group(function () {
     Route::get('/sys/hotelaria/hospedes/369/editar-hospede', [HospedeController::class, 'edit'])->name('hospedes.edit');
     Route::put('/sys/hotelaria/hospedes/741/atualizar-hospede', [HospedeController::class, 'update'])->name('hospedes.update');
     Route::delete('/sys/hotelaria/hospedes/852/remover-hospede', [HospedeController::class, 'destroy'])->name('hospedes.destroy');
-   Route::post('/sys/hotelaria/hospedes/{id}/checkout', [HospedeController::class, 'checkout'])->name('hospedes.checkout');
+    Route::post('/sys/hotelaria/hospedes/{id}/checkout', [HospedeController::class, 'checkout'])->name('hospedes.checkout');
 
+    Route::get('/fatura/{id}/pdf', function ($id) {
+        $fatura = Fatura::findOrFail($id);
+
+        return Pdf::loadView('faturas.recibo', compact('fatura'))->stream('Recibo_' . $fatura->numero . '.pdf');
+    })->name('fatura.pdf');
 });
 
 require __DIR__ . '/auth.php';

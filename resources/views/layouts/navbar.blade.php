@@ -49,7 +49,7 @@
 
 
               <li>
-                <a class="dropdown-item" href="{{ route('hotel.config') }}">
+                <a class="dropdown-item" href="{{ route('empresa.index') }}">
                 Configurações</a>
               </li>
               @endif
