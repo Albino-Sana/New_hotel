@@ -1,4 +1,9 @@
     <!-- Bootstrap JS Bundle with Popper -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -134,4 +139,194 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmButtonColor: '#f39c12',
         });
     @endif
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Desativa todos os avisos do DataTables
+        $.fn.dataTable.ext.errMode = 'none';
+
+        $('.table').DataTable({
+            select: true,
+            responsive: true,
+            ordering: false,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json',
+                paginate: {
+                    first:    '«',
+                    previous: '←',
+                    next:     '→',
+                    last:     '»'
+                }
+            },
+            pagingType: "simple_numbers", // ou "full_numbers" para mostrar todos os números
+            lengthMenu: [
+                [5, 10, 25, -1],
+                [5, 10, 25, "Todos"]
+            ],
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    function atualizarRelogio() {
+        const agora = new Date();
+        const dia = String(agora.getDate()).padStart(2, '0');
+        const mes = String(agora.getMonth() + 1).padStart(2, '0'); // Mês começa em 0
+        const ano = agora.getFullYear();
+        const horas = String(agora.getHours()).padStart(2, '0');
+        const minutos = String(agora.getMinutes()).padStart(2, '0');
+        const segundos = String(agora.getSeconds()).padStart(2, '0');
+        const dataHora = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+        document.getElementById('relogio').textContent = dataHora;
+    }
+
+    // Atualizar imediatamente
+    atualizarRelogio();
+    // Atualizar a cada segundo
+    setInterval(atualizarRelogio, 1000);
+});
+</script>
+
+<script>
+     // Verificar o checkbox gerar_pdf
+                    if (data.gerar_pdf) {
+                        // Abrir PDF em nova janela
+                        window.open(data.pdf_url, '_blank');
+                    } else {
+                        // Exibir SweetAlert para perguntar sobre impressão
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Imprimir Fatura?',
+                            text: 'Deseja imprimir a fatura da reserva?',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sim',
+                            cancelButtonText: 'Não',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.open(data.pdf_url, '_blank');
+                            }
+                        });
+                    }
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    $('#historicoModal').on('show.bs.modal', function () {
+        carregarHistorico();
+    });
+
+    // Atualizar histórico ao mudar filtros
+    $('#filtroDataInicio, #filtroDataFim, #filtroQuarto, #filtroStatus').on('change', function () {
+        carregarHistorico();
+    });
+
+    function carregarHistorico() {
+        const dataInicio = $('#filtroDataInicio').val();
+        const dataFim = $('#filtroDataFim').val();
+        const quartoId = $('#filtroQuarto').val();
+        const status = $('#filtroStatus').val();
+
+        $.ajax({
+            url: '{{ route('historico.index') }}',
+            method: 'GET',
+            data: {
+                data_inicio: dataInicio,
+                data_fim: dataFim,
+                quarto_id: quartoId,
+                status: status
+            },
+            success: function (data) {
+                const tbody = $('#historicoTabela');
+                tbody.empty();
+
+                if (data.length === 0) {
+                    tbody.append('<tr><td colspan="9" class="text-center">Nenhum registro encontrado.</td></tr>');
+                    return;
+                }
+
+                data.forEach(item => {
+                    // Definir ícones de ação com tooltips
+                    let acoes = `
+                        <button class="btn btn-sm btn-primary me-1" onclick="enviarEmail(${item.id}, '${item.tipo}')" data-bs-toggle="tooltip" data-bs-title="Enviar E-mail">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                    `;
+                    if (item.tipo === 'Reserva') {
+                        acoes += `
+                            <button class="btn btn-sm btn-success" onclick="verRecibo(${item.id})" data-bs-toggle="tooltip" data-bs-title="Ver Recibo">
+                                <i class="fas fa-receipt"></i>
+                            </button>
+                        `;
+                    } else if (item.tipo === 'Check-in' || item.tipo === 'Hóspede Direto') {
+                        acoes += `
+                            <button class="btn btn-sm btn-info" onclick="verFatura(${item.id}, '${item.tipo}')" data-bs-toggle="tooltip" data-bs-title="Ver Fatura">
+                                <i class="fas fa-file-invoice"></i>
+                            </button>
+                        `;
+                    }
+
+                    tbody.append(`
+                        <tr>
+                            <td>${item.tipo}</td>
+                            <td>${item.id}</td>
+                            <td>${item.cliente}</td>
+                            <td>${item.quarto}</td>
+                            <td>${item.data_entrada}</td>
+                            <td>${item.data_saida}</td>
+                            <td>${item.valor_total}</td>
+                            <td>${item.status}</td>
+                            <td>${acoes}</td>
+                        </tr>
+                    `);
+                });
+
+                // Inicializar tooltips após carregar a tabela
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            },
+            error: function () {
+                alert('Erro ao carregar o histórico. Tente novamente.');
+            }
+        });
+    }
+
+    window.enviarEmail = function (id, tipo) {
+        // Lógica para enviar e-mail (ex.: abrir modal ou redirecionar para rota de envio)
+        alert(`Enviar e-mail para ${tipo} ID ${id}`);
+    };
+
+    window.verFatura = function (id, tipo) {
+        // Lógica para exibir fatura
+        alert(`Visualizar fatura do ${tipo} ID ${id}`);
+    };
+
+    window.verRecibo = function (id) {
+        // Lógica para exibir recibo
+        alert(`Visualizar recibo da Reserva ID ${id}`);
+    };
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    atualizarContadorReservas();
+
+    // Opcional: atualizar a cada 60 segundos
+    setInterval(atualizarContadorReservas, 60000);
+});
+
+function atualizarContadorReservas() {
+    $.ajax({
+        url: '{{ route('contador.reservas') }}',
+        method: 'GET',
+        success: function (data) {
+            $('#contadorReservas').text(data.count);
+        },
+        error: function () {
+            console.error('Erro ao carregar contador de reservas.');
+        }
+    });
+}
 </script>

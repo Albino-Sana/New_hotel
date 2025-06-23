@@ -16,42 +16,31 @@ class PosController extends Controller
     public function index()
     {
         $user = Auth::user();
-$quartos = Quarto::with(['tipo', 'checkin', 'hospede'])
-                ->whereIn('status', ['Disponível', 'Ocupado', 'Reservado'])
-                ->orderBy('numero')
-                ->get();
+        $quartosTodos = Quarto::with(['tipo', 'checkin', 'hospede'])->get(); // Para exibir todos os quartos com tudo já carregado
+        $quartosDisponiveis = $quartosTodos->where('status', 'Disponivel'); // Usa o mesmo resultado para filtrar os disponíveis
 
-                         // Busca todas as reservas ativas
-                    $reservas = Reserva::where('status', 'reservado')
-                    ->where('data_entrada', '>=', now()->format('Y-m-d'))
-                    ->get();
+        // Busca todas as reservas ativas
+        $reservas = Reserva::with('hospede')
+            ->whereDoesntHave('checkin') // só reservas que ainda não têm check-in
+            ->where('status', '!=', 'finalizada') // e não estão finalizadas
+            ->get();
 
-                $checkin = Checkin::where('status', 'hospedado')->get();
-           $hospedesHospedados = Hospede::where('status', 'Hospedado')->with('quarto')->get();
+        $checkin = Checkin::where('status', 'hospedado')->get();
+        $hospedesHospedados = Hospede::where('status', 'Hospedado')->with('quarto')->get();
 
-                  $servicosAdicionais = ServicoAdicional::all();
-                    
+        $servicosAdicionais = ServicoAdicional::all();
+
         return view('POS.pos1', [
             'nomeUsuario' => $user->name,
             'cargo' => $user->cargo,
             'tipo' => $user->tipo,
-            'quartos' => $quartos,
             'reservas' => $reservas,
             'checkin' => $checkin,
-            'servicosAdicionais' => $servicosAdicionais,
-              'hospedesHospedados' => $hospedesHospedados
+            'servicosAdicionais' => $servicosAdicionais, // Corrigido: $servicosAdicional para $servicosAdicionais
+           'quartos' => $quartosTodos, // Agora contém os relacionamentos
+            'quartosDisponiveis' => $quartosDisponiveis, // Só os disponíveis para o select
+            'hospedesHospedados' => $hospedesHospedados
 
         ]);
-    }
-
-
-    public function storeCheckout(Request $request)
-    {
-        // Lógica de checkout
-    }
-
-    public function storeConsumo(Request $request)
-    {
-        // Lógica para adicionar consumo
     }
 }

@@ -132,8 +132,9 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        <div class="modal fade" id="editarHospedeModal{{ $hospede->id }}" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <!-- Modal de Editar Hóspede -->
+                                        <div class="modal fade" id="editarHospedeModal{{ $hospede->id }}" tabindex="-1" aria-labelledby="modalEditarHospedeLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg modal-dialog-centered">
                                                 <div class="modal-content">
                                                     <form action="{{ route('hospedes.update', $hospede->id) }}" method="POST">
                                                         @csrf
@@ -145,6 +146,7 @@
                                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
                                                         </div>
                                                         <div class="modal-body">
+                                                            <!-- Informações Pessoais -->
                                                             <div class="card mb-3 shadow-sm">
                                                                 <div class="card-header bg-light">
                                                                     <strong><i class="fas fa-id-card me-2 text-primary"></i>Informações Pessoais</strong>
@@ -162,23 +164,31 @@
                                                                         <label><i class="fas fa-phone me-1 text-secondary"></i>Telefone</label>
                                                                         <input type="text" class="form-control" name="telefone" value="{{ $hospede->telefone }}">
                                                                     </div>
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label><i class="fas fa-users me-1 text-secondary"></i>Nº Pessoas</label>
+                                                                        <input type="number" class="form-control" name="numero_pessoas" value="{{ $hospede->numero_pessoas ?? 1 }}" required min="1">
+                                                                    </div>
                                                                 </div>
                                                             </div>
+                                                            <!-- Detalhes da Hospedagem -->
                                                             <div class="card mb-3 shadow-sm">
                                                                 <div class="card-header bg-light">
                                                                     <strong><i class="fas fa-calendar-alt me-2 text-primary"></i>Período da Hospedagem</strong>
                                                                 </div>
                                                                 <div class="card-body row">
                                                                     <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-sign-in-alt me-1 text-secondary"></i>Data de Entrada</label>
-                                                                        <input type="date" class="form-control datepicker" name="data_entrada" value="{{ $hospede->data_entrada->format('Y-m-d') }}" required>
+                                                                        <label><i class="fas fa-sign-in-alt me-1 text-secondary"></i>Data e Hora de Entrada</label>
+                                                                        <input type="datetime-local" class="form-control" name="data_entrada" id="edit_data_entrada"
+                                                                            value="{{ $hospede->data_entrada ? \Carbon\Carbon::parse($hospede->data_entrada)->format('Y-m-d\TH:i') : '' }}" required>
                                                                     </div>
                                                                     <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-sign-out-alt me-1 text-secondary"></i>Data de Saída</label>
-                                                                        <input type="date" class="form-control datepicker" name="data_saida" value="{{ $hospede->data_saida->format('Y-m-d') }}" required>
+                                                                        <label><i class="fas fa-sign-out-alt me-1 text-secondary"></i>Data e Hora de Saída</label>
+                                                                        <input type="datetime-local" class="form-control" name="data_saida" id="edit_data_saida"
+                                                                            value="{{ $hospede->data_saida ? \Carbon\Carbon::parse($hospede->data_saida)->format('Y-m-d\TH:i') : '' }}" required>
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            <!-- Quarto e Valores -->
                                                             <div class="card mb-3 shadow-sm">
                                                                 <div class="card-header bg-light">
                                                                     <strong><i class="fas fa-bed me-2 text-primary"></i>Quarto e Valores</strong>
@@ -186,37 +196,104 @@
                                                                 <div class="card-body row">
                                                                     <div class="col-md-6 mb-3">
                                                                         <label><i class="fas fa-door-open me-1 text-secondary"></i>Quarto</label>
-                                                                        <select class="form-control" name="quarto_id">
-                                                                            <option value="" selected disabled>Selecionar Quarto</option>
+                                                                        <select id="edit_quarto" name="quarto_id" class="form-control" required>
+                                                                            <option value="">Selecione um quarto</option>
                                                                             @foreach($quartos as $quarto)
-                                                                            <option value="{{ $quarto->id }}" data-valor="{{ $quarto->preco_noite }}" {{ $quarto->id == $hospede->quarto_id ? 'selected' : '' }}> Quarto {{ $quarto->numero }} - {{ $quarto->tipo->nome }}</option>
+                                                                            <option value="{{ $quarto->id }}"
+                                                                                data-valor="{{ $quarto->preco_noite }}"
+                                                                                data-cobranca="{{ $quarto->tipo_cobranca ?? 'Diária' }}"
+                                                                                {{ $quarto->id == $hospede->quarto_id ? 'selected' : '' }}>
+                                                                                Quarto {{ $quarto->numero }} - {{ $quarto->tipo ? $quarto->tipo->nome : 'Sem Tipo' }}
+                                                                            </option>
                                                                             @endforeach
                                                                         </select>
                                                                     </div>
                                                                     <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-money-bill-wave me-1 text-secondary"></i>Valor a Pagar</label>
-                                                                        <input type="text" class="form-control" name="valor_a_pagar" value="{{ $hospede->valor_a_pagar }}" readonly>
+                                                                        <label><i class="fas fa-coins me-1 text-secondary"></i>Preço por Período</label>
+                                                                        <input type="number" name="preco_noite" id="edit_preco_noite"
+                                                                            value="{{ $hospede->preco_noite ?? '' }}" class="form-control" readonly>
                                                                     </div>
                                                                     <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-users me-1 text-secondary"></i>Nº Pessoas</label>
-                                                                        <input type="number" class="form-control" name="numero_pessoas" value="{{ $hospede->numero_pessoas }}" required min="1">
+                                                                        <label><i class="fas fa-credit-card me-1 text-secondary"></i>Tipo de Cobrança</label>
+                                                                        <input type="text" name="tipo_cobranca" id="edit_tipo_cobranca"
+                                                                            value="{{ $hospede->tipo_cobranca ?? 'Diária' }}" class="form-control" readonly>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                                <i class="fas fa-times me-1"></i> Cancelar
-                                                            </button>
                                                             <button type="submit" class="btn btn-success">
-                                                                <i class="fas fa-save me-1"></i> Salvar Alterações
+                                                                <i class="fas fa-save me-1"></i>Salvar
+                                                            </button>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                                <i class="fas fa-times me-1"></i>Cancelar
                                                             </button>
                                                         </div>
                                                     </form>
                                                 </div>
                                             </div>
                                         </div>
+                                        <!-- JavaScript para preencher os campos -->
+                                        @section('scripts')
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                const selectQuarto = document.getElementById('edit_quarto');
+                                                const precoInput = document.getElementById('edit_preco_noite');
+                                                const cobrancaInput = document.getElementById('edit_tipo_cobranca');
 
+                                                console.log('Script carregado (editar)', {
+                                                    selectQuarto: !!selectQuarto,
+                                                    precoInput: !!precoInput,
+                                                    cobrancaInput: !!cobrancaInput
+                                                });
+
+                                                if (selectQuarto && precoInput && cobrancaInput) {
+                                                    // Preenche os campos na inicialização com base no quarto selecionado
+                                                    const selected = selectQuarto.options[selectQuarto.selectedIndex];
+                                                    if (selected && selected.value) {
+                                                        const valorNoite = selected.getAttribute('data-valor');
+                                                        const tipoCobranca = selected.getAttribute('data-cobranca');
+                                                        if (valorNoite) {
+                                                            precoInput.value = parseFloat(valorNoite).toFixed(2);
+                                                        }
+                                                        if (tipoCobranca) {
+                                                            cobrancaInput.value = tipoCobranca;
+                                                        }
+                                                    }
+
+                                                    // Atualiza os campos ao mudar a seleção
+                                                    selectQuarto.addEventListener('change', function() {
+                                                        const selected = this.options[this.selectedIndex];
+                                                        const valorNoite = selected.getAttribute('data-valor');
+                                                        const tipoCobranca = selected.getAttribute('data-cobranca');
+
+                                                        console.log('Quarto selecionado (editar)', {
+                                                            valorNoite,
+                                                            tipoCobranca
+                                                        });
+
+                                                        if (valorNoite) {
+                                                            precoInput.value = parseFloat(valorNoite).toFixed(2);
+                                                        } else {
+                                                            precoInput.value = '';
+                                                        }
+
+                                                        if (tipoCobranca) {
+                                                            cobrancaInput.value = tipoCobranca;
+                                                        } else {
+                                                            cobrancaInput.value = '';
+                                                        }
+                                                    });
+                                                } else {
+                                                    console.error('Um ou mais elementos não foram encontrados no formulário de edição', {
+                                                        selectQuarto: !!selectQuarto,
+                                                        precoInput: !!precoInput,
+                                                        cobrancaInput: !!cobrancaInput
+                                                    });
+                                                }
+                                            });
+                                        </script>
+                                        @endsection
                                         <!-- Modal Check-out Hóspede -->
                                         <div class="modal fade" id="checkoutHospedeModal{{ $hospede->id }}" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -299,21 +376,18 @@
                     </div>
                 </div>
             </div>
-
             <!-- Modal de Adicionar Hóspede -->
             <div class="modal fade" id="modalNovoHospede" tabindex="-1" aria-labelledby="modalAdicionarHospedeLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
                         <form action="{{ route('hospedes.store') }}" method="POST">
                             @csrf
-
                             <div class="modal-header bg-gradient-primary text-white">
                                 <h5 class="modal-title text-white">
                                     <i class="fas fa-user-plus me-2"></i>Novo Hóspede
                                 </h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
                             </div>
-
                             <div class="modal-body">
                                 <!-- Informações Pessoais -->
                                 <div class="card mb-3 shadow-sm">
@@ -339,7 +413,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <!-- Detalhes da Hospedagem -->
                                 <div class="card mb-3 shadow-sm">
                                     <div class="card-header bg-light">
@@ -347,16 +420,15 @@
                                     </div>
                                     <div class="card-body row">
                                         <div class="col-md-6 mb-3">
-                                            <label><i class="fas fa-sign-in-alt me-1 text-secondary"></i>Data de Entrada</label>
-                                            <input type="date" class="form-control" name="data_entrada" id="nova_data_entrada" required>
+                                            <label><i class="fas fa-sign-in-alt me-1 text-secondary"></i>Data e Hora de Entrada</label>
+                                            <input type="datetime-local" class="form-control" name="data_entrada" id="nova_data_entrada" required>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label><i class="fas fa-sign-out-alt me-1 text-secondary"></i>Data de Saída</label>
-                                            <input type="date" class="form-control" name="data_saida" id="nova_data_saida" required>
+                                            <label><i class="fas fa-sign-out-alt me-1 text-secondary"></i>Data e Hora de Saída</label>
+                                            <input type="datetime-local" class="form-control" name="data_saida" id="nova_data_saida" required>
                                         </div>
                                     </div>
                                 </div>
-
                                 <!-- Quarto e Valores -->
                                 <div class="card mb-3 shadow-sm">
                                     <div class="card-header bg-light">
@@ -365,21 +437,28 @@
                                     <div class="card-body row">
                                         <div class="col-md-6 mb-3">
                                             <label><i class="fas fa-door-open me-1 text-secondary"></i>Quarto</label>
-                                            <select id="novo_quarto" name="quarto_id" class="form-control">
+                                            <select id="novo_quarto" name="quarto_id" class="form-control" required>
                                                 <option value="">Selecione um quarto</option>
                                                 @foreach($quartos as $quarto)
-                                                <option value="{{ $quarto->id }}" data-valor="{{ $quarto->preco_noite }}">Quarto {{ $quarto->numero }} - {{ $quarto->tipo->nome }}</option>
+                                                <option value="{{ $quarto->id }}"
+                                                    data-valor="{{ $quarto->preco_noite }}"
+                                                    data-cobranca="{{ $quarto->tipo_cobranca ?? 'Diária' }}">
+                                                    Quarto {{ $quarto->numero }} - {{ $quarto->tipo ? $quarto->tipo->nome : 'Sem Tipo' }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label><i class="fas fa-money-bill-wave me-1 text-secondary"></i>Valor a Pagar</label>
-                                            <input type="text" class="form-control" id="novo_valor" name="valor_a_pagar" readonly>
+                                            <label><i class="fas fa-coins me-1 text-secondary"></i>Preço por Período</label>
+                                            <input type="number" name="preco_noite" id="hospede_preco_noite" class="form-control" readonly>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label><i class="fas fa-credit-card me-1 text-secondary"></i>Tipo de Cobrança</label>
+                                            <input type="text" name="tipo_cobranca" id="hospede_tipo_cobranca" class="form-control" readonly>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-success">
                                     <i class="fas fa-save me-1"></i>Salvar
@@ -394,22 +473,58 @@
             </div>
 
         </div>
-
-
-
         </div>
     </main>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const selectQuarto = document.getElementById('novo_quarto');
-            const inputValor = document.getElementById('novo_valor');
+            const precoInput = document.getElementById('hospede_preco_noite');
+            const cobrancaInput = document.getElementById('hospede_tipo_cobranca');
 
-            selectQuarto.addEventListener('change', function() {
-                const valorNoite = this.options[this.selectedIndex].getAttribute('data-valor');
-                inputValor.value = valorNoite ? `AOA ${parseFloat(valorNoite).toFixed(2)}` : '';
+            // Log para verificar se os elementos foram encontrados
+            console.log('Script carregado', {
+                selectQuarto: !!selectQuarto,
+                precoInput: !!precoInput,
+                cobrancaInput: !!cobrancaInput
             });
+
+            if (selectQuarto && precoInput && cobrancaInput) {
+                selectQuarto.addEventListener('change', function() {
+                    const selected = this.options[this.selectedIndex];
+                    const valorNoite = selected.getAttribute('data-valor');
+                    const tipoCobranca = selected.getAttribute('data-cobranca');
+
+                    // Log para verificar os valores selecionados
+                    console.log('Quarto selecionado', {
+                        valorNoite,
+                        tipoCobranca
+                    });
+
+                    // Preencher preço por período
+                    if (valorNoite && !isNaN(parseFloat(valorNoite))) {
+                        precoInput.value = parseFloat(valorNoite).toFixed(2);
+                    } else {
+                        precoInput.value = '';
+                    }
+
+                    // Preencher tipo de cobrança
+                    if (tipoCobranca) {
+                        cobrancaInput.value = tipoCobranca;
+                    } else {
+                        cobrancaInput.value = '';
+                    }
+                });
+            } else {
+                console.error('Um ou mais elementos não foram encontrados', {
+                    selectQuarto: !!selectQuarto,
+                    precoInput: !!precoInput,
+                    cobrancaInput: !!cobrancaInput
+                });
+            }
         });
     </script>
+
     @include('layouts.customise')
     <!--   Core JS Files   -->
     @include('components.js')

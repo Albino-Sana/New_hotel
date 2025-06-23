@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fatura de Pagamento</title>
+    <title>Recibo de Estadia #{{ $checkout->id }}</title>
     <style>
         @page {
             size: A4;
@@ -172,9 +172,9 @@
                 <p>Sistema de Gestão Hoteleira</p>
             </div>
             <div class="invoice-info">
-                <div class="invoice-title">FATURA-RECIBO</div>
-                <div class="invoice-number">N.º {{ $pagamento->id }}</div>
-                <div><strong>Data de Emissão:</strong> {{ \Carbon\Carbon::parse($pagamento->data_pagamento)->format('d-m-Y') }}</div>
+                <div class="invoice-title">RECIBO DE ESTADIA</div>
+                <div class="invoice-number">N.º REC-{{ str_pad($checkout->id, 6, '0', STR_PAD_LEFT) }}</div>
+                <div><strong>Data de Emissão:</strong> {{ \Carbon\Carbon::now()->format('d-m-Y') }}</div>
             </div>
         </div>
         
@@ -182,62 +182,61 @@
             <div class="info-title">Dados do Estabelecimento</div>
             <div><strong>Nome:</strong> {{ $empresa->nome_empresa ?? 'Não definido' }}</div>
             <div><strong>Endereço:</strong> {{ $empresa->endereco_empresa ?? 'Não definido' }}, {{ $empresa->numero_edificio ?? '' }} {{ $empresa->nome_rua ?? '' }}, {{ $empresa->cidade ?? '' }}, {{ $empresa->provincia ?? '' }}</div>
-            <div><strong>Telefone:</strong> {{ $empresa->telefone ?? 'Excluido' }} | <strong>E-mail:</strong> {{ $empresa->email ?? 'Excluido' }}</div>
-            <div><strong>Contribuinte (NIF):</strong> {{ $empresa->numero_registo_fiscal ?? 'Excluido' }}</div>
-            <div><strong>Número de Validação do Software:</strong> {{ $empresa->numero_validacao_software ?? 'Excluido' }}</div>
+            <div><strong>Telefone:</strong> {{ $empresa->telefone ?? 'N/D' }} | <strong>E-mail:</strong> {{ $empresa->email ?? 'N/D' }}</div>
+            <div><strong>Contribuinte (NIF):</strong> {{ $empresa->numero_registo_fiscal ?? 'N/D' }}</div>
+            <div><strong>Número de Validação do Software:</strong> {{ $empresa->numero_validacao_software ?? 'N/D' }}</div>
         </div>
         
         <div class="client-info">
-            <div class="info-title">Cliente</div>
-            @if ($pagamento->checkin)
-                <div><strong>Nome:</strong> {{ $pagamento->checkin->reserva->cliente_nome ?? 'Excluido' }}</div>
-                <div><strong>NIF:</strong> {{ $pagamento->nif_cliente ?? 'Excluido' }}</div>
-            @elseif ($pagamento->hospede)
-                <div><strong>Nome:</strong> {{ $pagamento->hospede->nome }}</div>
-                <div><strong>NIF:</strong> {{ $pagamento->nif_cliente ?? 'Excluido' }}</div>
-            @else
-                <div><strong>Cliente não identificado</strong></div>
-            @endif
+            <div class="info-title">Hóspede</div>
+            <div><strong>Nome:</strong> {{ $checkout->checkin->reserva->cliente_nome ?? 'Não informado' }}</div>
+            <div><strong>Telefone:</strong> {{ $checkout->checkin->reserva->cliente_telefone ?? 'N/D' }}</div>
+            <div><strong>Quarto:</strong> {{ $checkout->checkin->quarto->numero ?? 'N/D' }} - {{ $checkout->checkin->quarto->tipo->nome ?? 'N/D' }}</div>
+            <div><strong>Check-in:</strong> {{ \Carbon\Carbon::parse($checkout->checkin->data_checkin)->format('d/m/Y H:i') }}</div>
+            <div><strong>Checkout:</strong> {{ \Carbon\Carbon::parse($checkout->data_checkout)->format('d/m/Y H:i') }}</div>
         </div>
         
         <table class="details-table">
             <thead>
                 <tr>
                     <th>Descrição</th>
-                    <th>Valor</th>
-                    <th>Data</th>
-                    <th>Método</th>
-                    <th>Status</th>
+                    <th>Quantidade</th>
+                    <th>Preço Unitário (KZ)</th>
+                    <th>Total (KZ)</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Pagamento #{{ $pagamento->id }}</td>
-                    <td>{{ number_format($pagamento->valor, 2, ',', '.') }} KZ</td>
-                    <td>{{ \Carbon\Carbon::parse($pagamento->data_pagamento)->format('d/m/Y H:i') }}</td>
-                    <td>{{ $pagamento->metodo_pagamento }}</td>
-                    <td>{{ ucfirst($pagamento->status_pagamento ?? 'confirmado') }}</td>
+                    <td>Estadia ({{ \Carbon\Carbon::parse($checkout->checkin->data_checkin)->diffInDays($checkout->data_checkout) }} dias)</td>
+                    <td>{{ \Carbon\Carbon::parse($checkout->checkin->data_checkin)->diffInDays($checkout->data_checkout) }}</td>
+                    <td>{{ number_format($checkout->checkin->quarto->preco_noite ?? 0, 2, ',', '.') }}</td>
+                    <td>{{ number_format((\Carbon\Carbon::parse($checkout->checkin->data_checkin)->diffInDays($checkout->data_checkout) * ($checkout->checkin->quarto->preco_noite ?? 0)), 2, ',', '.') }}</td>
                 </tr>
+                @foreach($servicos as $servico)
+                    <tr>
+                        <td>{{ $servico->nome }}</td>
+                        <td>1</td>
+                        <td>{{ number_format($servico->preco ?? 0, 2, ',', '.') }}</td>
+                        <td>{{ number_format($servico->valor ?? $servico->preco ?? 0, 2, ',', '.') }}</td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
         
         <div class="totals">
             <table class="totals-table">
                 <tr class="grand-total">
-                    <th>TOTAL PAGO</th>
-                    <td>{{ number_format($pagamento->valor, 2, ',', '.') }} KZ</td>
+                    <th>Total Pago:</th>
+                    <td>{{ number_format($checkout->valor_total, 3, ',', '.') }} KZ</td>
                 </tr>
             </table>
         </div>
         
         <div class="payment-info">
-            <p><em>Documento pago nesta data: {{ \Carbon\Carbon::parse($pagamento->data_pagamento)->format('d-m-Y') }}</em></p>
+            <p><em>Confirmado em: {{ \Carbon\Carbon::parse($pagamento->data_pagamento ?? now())->format('d-m-Y') }}</em></p>
             <p><strong>Meios de pagamento utilizados</strong></p>
-            <p><span class="payment-method">{{ $pagamento->metodo_pagamento }}</span> - {{ number_format($pagamento->valor, 2, ',', '.') }} KZ</p>
-            @if($pagamento->descricao)
-                <p><strong>Observações:</strong> {{ $pagamento->descricao }}</p>
-            @endif
-            <p><strong>Comentário:</strong> {{ $empresa->comentario_cabecalho ?? 'Obrigado pela sua preferência!' }}</p>
+            <p><span class="payment-method">{{ $pagamento->metodo_pagamento ?? 'Pendente' }}</span> - {{ number_format($pagamento->valor ?? $checkout->valor_total, 3, ',', '.') }} KZ (Status: {{ ucfirst($pagamento->status_pagamento ?? 'pendente') }})</p>
+            <p><strong>Comentário:</strong> {{ $empresa->empty ?? 'Obrigado pela sua hospedagem!' }}</p>
         </div>
         
         <div class="signature-area">
@@ -247,7 +246,7 @@
         </div>
         
         <div class="qr-code">
-            [QR CODE]
+            [QR Code]
         </div>
         
         <div class="footer">

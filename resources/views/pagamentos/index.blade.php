@@ -19,7 +19,7 @@
 
     <main class="main-content position-relative border-radius-lg">
         @php
-            $titulo = 'Pagamentos';
+        $titulo = 'Pagamentos';
         @endphp
         @include('layouts.navbar', ['titulo' => $titulo])
 
@@ -54,17 +54,17 @@
                                             </td>
                                             <td class="text-center">
                                                 @if ($pagamento->checkin && $pagamento->checkin->reserva)
-                                                    <span class="text-xs text-secondary font-weight-bold">
-                                                        {{ $pagamento->checkin->reserva->cliente_nome }}
-                                                    </span>
+                                                <span class="text-xs text-secondary font-weight-bold">
+                                                    {{ $pagamento->checkin->reserva->cliente_nome }}
+                                                </span>
                                                 @elseif ($pagamento->hospede)
-                                                    <span class="text-xs text-secondary font-weight-bold">
-                                                        {{ $pagamento->hospede->nome }}
-                                                    </span>
+                                                <span class="text-xs text-secondary font-weight-bold">
+                                                    {{ $pagamento->hospede->nome }}
+                                                </span>
                                                 @else
-                                                    <span class="text-xs text-danger font-weight-bold">
-                                                        Origem indefinida
-                                                    </span>
+                                                <span class="text-xs text-danger font-weight-bold">
+                                                    Origem indefinida
+                                                </span>
                                                 @endif
                                             </td>
                                             <td>
@@ -75,12 +75,12 @@
                                             </td>
                                             <td class="align-middle text-center">
                                                 @php
-                                                    $badgeColor = match($pagamento->status_pagamento) {
-                                                        'pago' => 'success',
-                                                        'pendente' => 'warning',
-                                                        'falhou' => 'danger',
-                                                        default => 'secondary'
-                                                    };
+                                                $badgeColor = match($pagamento->status_pagamento) {
+                                                'pago' => 'success',
+                                                'pendente' => 'warning',
+                                                'falhou' => 'danger',
+                                                default => 'secondary'
+                                                };
                                                 @endphp
                                                 <span class="badge bg-{{ $badgeColor }}">
                                                     {{ ucfirst($pagamento->status_pagamento) }}
@@ -99,9 +99,9 @@
                                                     </button>
                                                 </form>
                                                 @if ($pagamento->status_pagamento === 'pago')
-                                                    <a href="{{ route('pagamentos.fatura', $pagamento->id) }}" class="btn btn-link text-primary text-xs mb-0" target="_blank">
-                                                        Fatura
-                                                    </a>
+                                                <a href="{{ route('pagamentos.fatura', $pagamento->id) }}" class="btn btn-link text-primary text-xs mb-0" target="_blank">
+                                                    Fatura
+                                                </a>
                                                 @endif
                                             </td>
                                         </tr>
@@ -122,49 +122,67 @@
                                                         <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                                                             <div class="row g-3">
                                                                 <!-- Origem -->
+                                                                <!-- Origem -->
                                                                 <div class="col-12">
                                                                     <label class="form-label">Origem do Pagamento</label>
-                                                                    <select name="origem" id="tipo_origem_edit{{ $pagamento->id }}" class="form-select" onchange="toggleEditSelects({{ $pagamento->id }})" required>
+                                                                    <select name="origem" id="tipo_origem_edit{{ $pagamento->id }}" class="form-select" onchange="toggleEditSelects({{ $pagamento->id }})" required {{ $pagamento->checkin_id ? 'disabled' : '' }}>
                                                                         <option value="">-- Selecione --</option>
                                                                         <option value="checkin" {{ $pagamento->checkin_id ? 'selected' : '' }}>Check-in</option>
                                                                         <option value="hospede" {{ $pagamento->hospede_id ? 'selected' : '' }}>Hóspede</option>
                                                                     </select>
+                                                                    @if($pagamento->checkin_id)
+                                                                    <!-- envia o valor como hidden, já que o select está disabled -->
+                                                                    <input type="hidden" name="origem" value="checkin">
+                                                                    @elseif($pagamento->hospede_id)
+                                                                    <input type="hidden" name="origem" value="hospede">
+                                                                    @endif
                                                                     @error('origem')
-                                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                                                     @enderror
                                                                 </div>
 
+
+                                                                <!-- Select Check-in -->
                                                                 <!-- Select Check-in -->
                                                                 <div class="col-12" id="checkin_select_edit{{ $pagamento->id }}" style="display: {{ $pagamento->checkin_id ? 'block' : 'none' }};">
                                                                     <label class="form-label">Check-in</label>
-                                                                    <select name="checkin_id" class="form-select" {{ $pagamento->checkin_id ? '' : 'disabled' }} onchange="handleEditSelectChange({{ $pagamento->id }}, 'checkin')">
+                                                                    <select name="checkin_id" class="form-select" {{ $pagamento->checkin_id ? 'disabled' : '' }} onchange="handleEditSelectChange({{ $pagamento->id }}, 'checkin')">
                                                                         <option value="">-- Nenhum --</option>
                                                                         @foreach ($checkins as $checkin)
-                                                                            <option value="{{ $checkin->id }}" {{ $pagamento->checkin_id == $checkin->id ? 'selected' : '' }}>
-                                                                                #{{ $checkin->id }} - {{ $checkin->reserva->cliente_nome ?? 'Sem Nome' }}
-                                                                            </option>
+                                                                        <option value="{{ $checkin->id }}" {{ $pagamento->checkin_id == $checkin->id ? 'selected' : '' }}>
+                                                                            #{{ $checkin->id }} - {{ $checkin->reserva->cliente_nome ?? 'Sem Nome' }}
+                                                                        </option>
                                                                         @endforeach
                                                                     </select>
+                                                                    @if($pagamento->checkin_id)
+                                                                    <input type="hidden" name="checkin_id" value="{{ $pagamento->checkin_id }}">
+                                                                    @endif
                                                                     @error('checkin_id')
-                                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                                                     @enderror
                                                                 </div>
 
+
                                                                 <!-- Select Hóspede -->
-                                                                <div class="col-12" id="hospede_select_edit{{ $pagamento->id }}" style="display: {{ $pagamento->hospede_id ? 'block' : 'none' }};">
+                                                                <!-- Select Hóspede -->
+                                                                <div class="col-12" id="hospede_select_edit{{ $pagamento->id }}" style="display: {{ $pagamento->hospede_id && !$pagamento->checkin_id ? 'block' : 'none' }};">
                                                                     <label class="form-label">Hóspede</label>
-                                                                    <select name="hospede_id" class="form-select" {{ $pagamento->hospede_id ? '' : 'disabled' }} onchange="handleEditSelectChange({{ $pagamento->id }}, 'hospede')">
+                                                                    <select name="hospede_id" class="form-select" {{ $pagamento->checkin_id ? 'disabled' : '' }} onchange="handleEditSelectChange({{ $pagamento->id }}, 'hospede')">
                                                                         <option value="">-- Nenhum --</option>
                                                                         @foreach ($hospedes as $hospede)
-                                                                            <option value="{{ $hospede->id }}" {{ $pagamento->hospede_id == $hospede->id ? 'selected' : '' }}>
-                                                                                #{{ $hospede->id }} - {{ $hospede->nome }}
-                                                                            </option>
+                                                                        <option value="{{ $hospede->id }}" {{ $pagamento->hospede_id == $hospede->id ? 'selected' : '' }}>
+                                                                            #{{ $hospede->id }} - {{ $hospede->nome }}
+                                                                        </option>
                                                                         @endforeach
                                                                     </select>
+                                                                    @if($pagamento->hospede_id)
+                                                                    <input type="hidden" name="hospede_id" value="{{ $pagamento->hospede_id }}">
+                                                                    @endif
                                                                     @error('hospede_id')
-                                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                                                     @enderror
                                                                 </div>
+
                                                             </div>
 
                                                             <!-- Valor -->
@@ -173,7 +191,7 @@
                                                                     <label class="form-label">Valor</label>
                                                                     <input type="number" step="0.01" name="valor" id="valor_edit{{ $pagamento->id }}" value="{{ $pagamento->valor }}" class="form-control @error('valor') is-invalid @enderror" required>
                                                                     @error('valor')
-                                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
                                                                     @enderror
                                                                 </div>
                                                             </div>
@@ -188,7 +206,7 @@
                                                                         <option value="falhou" {{ $pagamento->status_pagamento == 'falhou' ? 'selected' : '' }}>Falhou</option>
                                                                     </select>
                                                                     @error('status_pagamento')
-                                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
                                                                     @enderror
                                                                 </div>
                                                             </div>
@@ -200,13 +218,13 @@
                                                                     <select name="metodo_pagamento" class="form-select @error('metodo_pagamento') is-invalid @enderror" required>
                                                                         <option value="">Selecione...</option>
                                                                         @foreach($metodos_pagamento as $metodo)
-                                                                            <option value="{{ $metodo->designacao }}" {{ $pagamento->metodo_pagamento == $metodo->designacao ? 'selected' : '' }}>
-                                                                                {{ $metodo->designacao }}
-                                                                            </option>
+                                                                        <option value="{{ $metodo->designacao }}" {{ $pagamento->metodo_pagamento == $metodo->designacao ? 'selected' : '' }}>
+                                                                            {{ $metodo->designacao }}
+                                                                        </option>
                                                                         @endforeach
                                                                     </select>
                                                                     @error('metodo_pagamento')
-                                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
                                                                     @enderror
                                                                 </div>
                                                             </div>
@@ -251,7 +269,7 @@
                                     <option value="hospede">Hóspede</option>
                                 </select>
                                 @error('origem')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -261,11 +279,11 @@
                                 <select name="checkin_id" id="checkin_id" class="form-select @error('checkin_id') is-invalid @enderror" onchange="handleSelectChange('checkin')">
                                     <option value="">-- Nenhum --</option>
                                     @foreach ($checkins as $checkin)
-                                        <option value="{{ $checkin->id }}">#{{ $checkin->id }} - {{ $checkin->reserva->cliente_nome ?? 'Sem nome' }}</option>
+                                    <option value="{{ $checkin->id }}">#{{ $checkin->id }} - {{ $checkin->reserva->cliente_nome ?? 'Sem nome' }}</option>
                                     @endforeach
                                 </select>
                                 @error('checkin_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -275,11 +293,11 @@
                                 <select name="hospede_id" id="hospede_id" class="form-select @error('hospede_id') is-invalid @enderror" onchange="handleSelectChange('hospede')">
                                     <option value="">-- Nenhum --</option>
                                     @foreach ($hospedes as $hospede)
-                                        <option value="{{ $hospede->id }}">#{{ $hospede->id }} - {{ $hospede->nome }}</option>
+                                    <option value="{{ $hospede->id }}">#{{ $hospede->id }} - {{ $hospede->nome }}</option>
                                     @endforeach
                                 </select>
                                 @error('hospede_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -288,7 +306,7 @@
                                 <label class="form-label">Valor Total</label>
                                 <input type="number" step="0.01" id="valor" name="valor" class="form-control @error('valor') is-invalid @enderror" required>
                                 @error('valor')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -298,11 +316,11 @@
                                 <select name="metodo_pagamento" class="select2 form-select @error('metodo_pagamento') is-invalid @enderror" required>
                                     <option value="">Selecione...</option>
                                     @foreach($metodos_pagamento as $metodo)
-                                        <option value="{{ $metodo->designacao }}">{{ $metodo->designacao }}</option>
+                                    <option value="{{ $metodo->designacao }}">{{ $metodo->designacao }}</option>
                                     @endforeach
                                 </select>
                                 @error('metodo_pagamento')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -315,7 +333,7 @@
                                     <option value="falhou">Falhou</option>
                                 </select>
                                 @error('status_pagamento')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
@@ -325,7 +343,7 @@
                                 <input type="checkbox" name="gerar_fatura" value="1" class="form-check-input" id="faturaCheck" {{ old('gerar_fatura') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="faturaCheck">Gerar fatura após salvar</label>
                                 @error('gerar_fatura')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
@@ -340,13 +358,13 @@
     </main>
 
     @if (session('fatura_id'))
-        <script>
-            window.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
-                    window.open("{{ route('pagamentos.fatura', session('fatura_id')) }}", '_blank');
-                }, 1000);
-            });
-        </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                window.open("{{ route('pagamentos.fatura', session('fatura_id')) }}", '_blank');
+            }, 1000);
+        });
+    </script>
     @endif
 
     @include('components.js')
@@ -450,7 +468,8 @@
             $('select[name="metodo_pagamento"]').select2();
         });
     </script>
-  
+
 
 </body>
+
 </html>

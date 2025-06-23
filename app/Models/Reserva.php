@@ -7,6 +7,7 @@ use App\Models\Quarto;
 use App\Models\User;
 use App\Models\Hospede;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\ServicoAdicional;
 
 class Reserva extends Model
 {
@@ -38,6 +39,8 @@ class Reserva extends Model
         return $this->hasOne(Checkin::class);
     }
 
+    
+
     public function quarto()
     {
         return $this->belongsTo(Quarto::class);
@@ -48,6 +51,10 @@ class Reserva extends Model
         return $this->hasOne(Pagamento::class);
     }
 
+    public function servicosAdicionais()
+{
+    return $this->belongsToMany(ServicoAdicional::class, 'reserva_servico_adicional', 'reserva_id', 'servico_adicional_id');
+}
 
     public function user()
     {

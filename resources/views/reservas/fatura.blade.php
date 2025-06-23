@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fatura de Pagamento</title>
+    <title>Fatura Reserva #{{ $reserva->id }}</title>
     <style>
         @page {
             size: A4;
@@ -62,8 +62,8 @@
         }
         
         .client-info {
-            background-color: #f1f8fe;
-            border-left: 4px solid #2980b9;
+            background-color: #f8f9fa;
+            border-left: 4px solid #e67e22;
         }
         
         .info-title {
@@ -121,16 +121,11 @@
             background-color: #ecf0f1 !important;
         }
         
-        .payment-info {
+        .reservation-info {
             margin-top: 30px;
             padding: 15px;
             background-color: #f8f9fa;
             border-radius: 5px;
-        }
-        
-        .payment-method {
-            font-weight: bold;
-            color: #27ae60;
         }
         
         .footer {
@@ -173,30 +168,28 @@
             </div>
             <div class="invoice-info">
                 <div class="invoice-title">FATURA-RECIBO</div>
-                <div class="invoice-number">N.º {{ $pagamento->id }}</div>
-                <div><strong>Data de Emissão:</strong> {{ \Carbon\Carbon::parse($pagamento->data_pagamento)->format('d-m-Y') }}</div>
+                <div class="invoice-number">Reserva #{{ $reserva->id }}</div>
+                <div><strong>Data de Emissão:</strong> {{ \Carbon\Carbon::now()->format('d-m-Y') }}</div>
             </div>
         </div>
         
         <div class="company-info">
             <div class="info-title">Dados do Estabelecimento</div>
             <div><strong>Nome:</strong> {{ $empresa->nome_empresa ?? 'Não definido' }}</div>
-            <div><strong>Endereço:</strong> {{ $empresa->endereco_empresa ?? 'Não definido' }}, {{ $empresa->numero_edificio ?? '' }} {{ $empresa->nome_rua ?? '' }}, {{ $empresa->cidade ?? '' }}, {{ $empresa->provincia ?? '' }}</div>
-            <div><strong>Telefone:</strong> {{ $empresa->telefone ?? 'Excluido' }} | <strong>E-mail:</strong> {{ $empresa->email ?? 'Excluido' }}</div>
-            <div><strong>Contribuinte (NIF):</strong> {{ $empresa->numero_registo_fiscal ?? 'Excluido' }}</div>
-            <div><strong>Número de Validação do Software:</strong> {{ $empresa->numero_validacao_software ?? 'Excluido' }}</div>
+            <div><strong>Endereço:</strong> {{ $empresa->endereco_empresa ?? 'Não definido' }}</div>
+            <div><strong>Telefone:</strong> {{ $empresa->telefone ?? 'N/D' }} | <strong>E-mail:</strong> {{ $empresa->email ?? 'N/D' }}</div>
+            <div><strong>Contribuinte (NIF):</strong> {{ $empresa->NIF ?? '9999999' }}</div>
         </div>
         
         <div class="client-info">
             <div class="info-title">Cliente</div>
-            @if ($pagamento->checkin)
-                <div><strong>Nome:</strong> {{ $pagamento->checkin->reserva->cliente_nome ?? 'Excluido' }}</div>
-                <div><strong>NIF:</strong> {{ $pagamento->nif_cliente ?? 'Excluido' }}</div>
-            @elseif ($pagamento->hospede)
-                <div><strong>Nome:</strong> {{ $pagamento->hospede->nome }}</div>
-                <div><strong>NIF:</strong> {{ $pagamento->nif_cliente ?? 'Excluido' }}</div>
-            @else
-                <div><strong>Cliente não identificado</strong></div>
+            <div><strong>Nome:</strong> {{ $reserva->cliente_nome ?? 'N/D' }}</div>
+            <div><strong>Documento:</strong> {{ $reserva->cliente_documento ?? 'N/D' }}</div>
+            @if($reserva->cliente_email)
+                <div><strong>Email:</strong> {{ $reserva->cliente_email }}</div>
+            @endif
+            @if($reserva->cliente_telefone)
+                <div><strong>Telefone:</strong> {{ $reserva->cliente_telefone }}</div>
             @endif
         </div>
         
@@ -204,39 +197,46 @@
             <thead>
                 <tr>
                     <th>Descrição</th>
-                    <th>Valor</th>
-                    <th>Data</th>
-                    <th>Método</th>
-                    <th>Status</th>
+                    <th>Detalhes</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Pagamento #{{ $pagamento->id }}</td>
-                    <td>{{ number_format($pagamento->valor, 2, ',', '.') }} KZ</td>
-                    <td>{{ \Carbon\Carbon::parse($pagamento->data_pagamento)->format('d/m/Y H:i') }}</td>
-                    <td>{{ $pagamento->metodo_pagamento }}</td>
-                    <td>{{ ucfirst($pagamento->status_pagamento ?? 'confirmado') }}</td>
+                    <td>Quarto</td>
+                    <td>Quarto {{ $reserva->quarto->numero }} - {{ $reserva->quarto->tipo->nome }}</td>
                 </tr>
+                <tr>
+                    <td>Data de Entrada</td>
+                    <td>{{ \Carbon\Carbon::parse($reserva->data_entrada)->format('d/m/Y H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Data de Saída</td>
+                    <td>{{ \Carbon\Carbon::parse($reserva->data_saida)->format('d/m/Y H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Número de Pessoas</td>
+                    <td>{{ $reserva->numero_pessoas }}</td>
+                </tr>
+                @if($reserva->observacoes)
+                <tr>
+                    <td>Observações</td>
+                    <td>{{ $reserva->observacoes }}</td>
+                </tr>
+                @endif
             </tbody>
         </table>
         
         <div class="totals">
             <table class="totals-table">
                 <tr class="grand-total">
-                    <th>TOTAL PAGO</th>
-                    <td>{{ number_format($pagamento->valor, 2, ',', '.') }} KZ</td>
+                    <th>VALOR TOTAL</th>
+                    <td>{{ number_format($reserva->valor_total, 2, ',', '.') }} KZ</td>
                 </tr>
             </table>
         </div>
         
-        <div class="payment-info">
-            <p><em>Documento pago nesta data: {{ \Carbon\Carbon::parse($pagamento->data_pagamento)->format('d-m-Y') }}</em></p>
-            <p><strong>Meios de pagamento utilizados</strong></p>
-            <p><span class="payment-method">{{ $pagamento->metodo_pagamento }}</span> - {{ number_format($pagamento->valor, 2, ',', '.') }} KZ</p>
-            @if($pagamento->descricao)
-                <p><strong>Observações:</strong> {{ $pagamento->descricao }}</p>
-            @endif
+        <div class="reservation-info">
+            <p><em>Reserva registrada em: {{ \Carbon\Carbon::now()->format('d-m-Y') }}</em></p>
             <p><strong>Comentário:</strong> {{ $empresa->comentario_cabecalho ?? 'Obrigado pela sua preferência!' }}</p>
         </div>
         
@@ -251,7 +251,7 @@
         </div>
         
         <div class="footer">
-            <p>Processado por {{ $empresa->id_produto ?? 'Sistema de Hotelaria' }} - Versão {{ $empresa->versao_produto ?? 'N/D' }}</p>
+            <p>Processado por {{ $empresa->nome ?? 'Sistema de Hotelaria' }} - Versão {{ $empresa->versao_produto ?? 'N/D' }}</p>
             <p>Este documento é gerado eletronicamente</p>
         </div>
     </div>

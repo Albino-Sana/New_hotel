@@ -23,7 +23,7 @@
         document.getElementById('grafico-titulo').textContent = 'Carregando...';
         document.getElementById('variacao-texto').textContent = 'Carregando...';
 
-        fetch(`/relatorios/dados-ocupacao?periodo=${periodo}`)
+        fetch(`/sys/hotelaria/relatorios/dados-ocupacao?periodo=${periodo}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('grafico-titulo').textContent = data.titulo;

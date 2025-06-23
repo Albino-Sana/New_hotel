@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Models\TipoQuarto;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+use App\Models\Checkin;
+use App\Models\Reserva;
+use App\Models\Hospede;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,22 +28,28 @@ class Quarto extends Model
     ];
 
     public function checkin()
-{
-    return $this->hasOne(Checkin::class)->where('status', 'Hospedado');
-}
-public function reserva()
-{
-    return $this->hasOne(Reserva::class, 'quarto_id', 'id');
-}
+    {
+        return $this->hasOne(Checkin::class)->where('status', 'Hospedado');
+    }
+    public function reservas()
+    {
+        return $this->hasMany(Reserva::class);
+    }
+
+
+
 public function hospede()
-{
-    return $this->hasOne(Hospede::class, 'quarto_id')->latest(); 
-}
+    {
+        return $this->hasOne(Hospede::class, 'quarto_id')->where('status', 'Hospedado');
+    }
+
+    public function tipoQuarto()
+    {
+        return $this->belongsTo(TipoQuarto::class, 'tipo_quarto_id');
+    }
 
     public function tipo()
     {
         return $this->belongsTo(TipoQuarto::class, 'tipo_quarto_id');
     }
-
-
 }

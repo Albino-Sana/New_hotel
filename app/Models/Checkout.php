@@ -31,4 +31,14 @@ class Checkout extends Model
     {
         return $this->hasMany(CheckoutHospede::class);
     }
+    // App\Models\Checkout.php
+public function servicosAdicionais()
+{
+    return $this->belongsToMany(ServicoAdicional::class, 'checkout_servico_adicional', 'checkout_id', 'servico_adicional_id');
+}
+
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class);
+    }
 }

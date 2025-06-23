@@ -115,10 +115,10 @@
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <h5 class="mb-0">{{ number_format($quarto->preco_noite, 2, ',', '.') }} Kz</h5>
                                                 <span class="text-sm">
-                                                    @if($quarto->tipo_cobranca === 'por_hora')
-                                                    /hora
-                                                    @elseif($quarto->tipo_cobranca === 'por_noite')
-                                                    /noite
+                                                    @if($quarto->tipo_cobranca === 'Por Hora')
+                                                    Por Hora
+                                                    @elseif($quarto->tipo_cobranca === 'Por Noite')
+                                                    Por Noite
                                                     @else
                                                     /período
                                                     @endif
@@ -138,7 +138,7 @@
 
                                                 <form action="{{ route('quartos.destroy', $quarto) }}" method="POST" class="d-inline">
                                                     @csrf @method('DELETE')
-                                                    <button type="button" class="btn btn-sm btn-outline-danger mb-0 btn-delete"
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger mb-0 btn-delete"
                                                         data-url="{{ route('quartos.destroy', $quarto) }}">
                                                         <i class="fas fa-trash-alt me-1"></i> Excluir
                                                     </button>
@@ -157,36 +157,30 @@
                                                 @method('PUT')
 
                                                 <div class="modal-header bg-gradient-primary text-white">
-                                                    <h5 class="modal-title text-white">
-                                                        <i class="fas fa-edit me-2"></i>Editar Quarto
-                                                    </h5>
+                                                    <h5 class="modal-title text-white"><i class="fas fa-edit me-2"></i>Editar Quarto</h5>
                                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
                                                 </div>
 
-                                                <div class="modal-body">
+                                                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                                                     <!-- Informações Básicas -->
                                                     <div class="card mb-3 shadow-sm">
                                                         <div class="card-header bg-light">
                                                             <strong><i class="fas fa-info-circle me-2 text-primary"></i>Informações Básicas</strong>
                                                         </div>
-                                                        <div class="card-body">
-                                                            <div class="row">
-                                                                <div class="col-md-6 mb-3">
-                                                                    <label><i class="fas fa-hashtag me-1 text-secondary"></i>Número do Quarto</label>
-                                                                    <input type="text" name="numero" class="form-control" value="{{ $quarto->numero }}" required>
-                                                                </div>
-
-                                                                <div class="col-md-6 mb-3">
-                                                                    <label><i class="fas fa-layer-group me-1 text-secondary"></i>Andar</label>
-                                                                    <select name="andar" class="form-control" required>
-                                                                        <option value="">Selecione o andar</option>
-                                                                        @for($i = 1; $i <= 30; $i++)
-                                                                            <option value="{{ $i }}" {{ $quarto->andar == $i ? 'selected' : '' }}>
-                                                                            {{ $i }}º Andar
-                                                                            </option>
-                                                                            @endfor
-                                                                    </select>
-                                                                </div>
+                                                        <div class="card-body row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <label><i class="fas fa-hashtag me-1 text-secondary"></i>Número do Quarto</label>
+                                                                <input type="text" name="numero" class="form-control" value="{{ $quarto->numero }}" required>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <label><i class="fas fa-layer-group me-1 text-secondary"></i>Andar</label>
+                                                                <select name="andar" class="form-control" required>
+                                                                    @for($i = 1; $i <= 30; $i++)
+                                                                        <option value="{{ $i }}" {{ $quarto->andar == $i ? 'selected' : '' }}>
+                                                                        {{ $i }}º Andar
+                                                                        </option>
+                                                                        @endfor
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -194,60 +188,75 @@
                                                     <!-- Tipo e Status -->
                                                     <div class="card mb-3 shadow-sm">
                                                         <div class="card-header bg-light">
-                                                            <strong><i class="fas fa-tags me-2 text-primary"></i>Configurações</strong>
+                                                            <strong><i class="fas fa-tags me-2 text-primary"></i>Tipo e Status</strong>
                                                         </div>
-                                                        <div class="card-body">
-                                                            <div class="row">
-                                                                <div class="col-md-6 mb-3">
-                                                                    <label><i class="fas fa-hotel me-1 text-secondary"></i>Tipo de Quarto</label>
-                                                                    <select class="form-control" name="tipo_quarto_id" required>
-                                                                        @foreach($tipos as $tipo)
-                                                                        <option value="{{ $tipo->id }}" {{ $quarto->tipo_quarto_id == $tipo->id ? 'selected' : '' }}>
-                                                                            {{ $tipo->nome }}
-                                                                        </option>
-                                                                        @endforeach
-                                                                    </select>
-                                                                </div>
+                                                        <div class="card-body row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <label><i class="fas fa-hotel me-1 text-secondary"></i>Tipo de Quarto</label>
+                                                                <select class="form-control tipo_quarto_select" name="tipo_quarto_id" required>
+                                                                    @foreach($tipos as $tipo)
+                                                                    <option value="{{ $tipo->id }}"
+                                                                        {{ $quarto->tipo_quarto_id == $tipo->id ? 'selected' : '' }}
+                                                                        data-preco="{{ $tipo->preco }}"
+                                                                        data-cobranca="{{ $tipo->tipo_cobranca }}">
+                                                                        {{ $tipo->nome }}
+                                                                    </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
 
-                                                                <div class="col-md-6 mb-3">
-                                                                    <label><i class="fas fa-toggle-on me-1 text-secondary"></i>Status</label>
-                                                                    <select class="form-control" name="status" required>
-                                                                        <option value="Disponível" {{ $quarto->status == 'Disponível' ? 'selected' : '' }}>Disponível</option>
-                                                                        <option value="Indisponível" {{ $quarto->status == 'Indisponível' ? 'selected' : '' }}>Indisponível</option>
-                                                                        <option value="Reservado" {{ $quarto->status == 'Reservado' ? 'selected' : '' }}>Reservado</option>
-                                                                        <option value="Manutenção" {{ $quarto->status == 'Manutenção' ? 'selected' : '' }}>Manutenção</option>
-                                                                    </select>
-                                                                </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <label><i class="fas fa-toggle-on me-1 text-secondary"></i>Status</label>
+                                                                <select class="form-control" name="status" required>
+                                                                    <option value="Disponível" {{ $quarto->status == 'Disponível' ? 'selected' : '' }}>Disponível</option>
+                                                                    <option value="Ocupado" {{ $quarto->status == 'Ocupado' ? 'selected' : '' }}>Ocupado</option>
+                                                                    <option value="Reservado" {{ $quarto->status == 'Reservado' ? 'selected' : '' }}>Reservado</option>
+                                                                    <option value="Manutenção" {{ $quarto->status == 'Manutenção' ? 'selected' : '' }}>Manutenção</option>
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <!-- Valores -->
+                                                    <!-- Preço -->
                                                     <div class="card mb-3 shadow-sm">
                                                         <div class="card-header bg-light">
                                                             <strong><i class="fas fa-money-bill-wave me-2 text-primary"></i>Valores</strong>
                                                         </div>
                                                         <div class="card-body">
                                                             <div class="mb-3">
-                                                                <label><i class="fas fa-coins me-1 text-secondary"></i>Preço por Noite</label>
-                                                                <input type="number" class="form-control" name="preco_noite" value="{{ $quarto->preco_noite }}" required>
+                                                                <label><i class="fas fa-coins me-1 text-secondary"></i>Preço por Periodo</label>
+                                                                <input type="number" name="preco_noite" id="preco_noite_{{ $quarto->id }}" value="{{ $quarto->preco_noite }}" step="0.01" class="form-control" required>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label><i class="fas fa-credit-card me-1 text-secondary"></i>Tipo de Cobrança</label>
+                                                                <input type="text" name="tipo_cobranca" id="tipo_cobranca_{{ $quarto->id }}" class="form-control" value="{{ $quarto->tipoQuarto->tipo_cobranca ?? '' }}" readonly required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Descrição -->
+                                                    <div class="card mb-3 shadow-sm">
+                                                        <div class="card-header bg-light">
+                                                            <strong><i class="fas fa-align-left me-2 text-primary"></i>Descrição</strong>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div class="mb-3">
+                                                                <label><i class="fas fa-comment me-1 text-secondary"></i>Detalhes</label>
+                                                                <textarea name="descricao" class="form-control" rows="3">{{ $quarto->descricao }}</textarea>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-success">
-                                                        <i class="fas fa-save me-1"></i>Salvar Alterações
-                                                    </button>
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                        <i class="fas fa-times me-1"></i>Cancelar
-                                                    </button>
+                                                    <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i>Salvar Alterações</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i>Cancelar</button>
                                                 </div>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
+
                                 @endforeach
                             </div>
                         </div>
@@ -340,7 +349,7 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="mb-3" id="preco-wrapper">
-                                            <label><i class="fas fa-coins me-1 text-secondary"></i>Preço por Noite</label>
+                                            <label><i class="fas fa-coins me-1 text-secondary"></i>Preço por Periodo</label>
                                             <input type="number" name="preco_noite" id="preco_noite" class="form-control" step="0.01" required>
                                         </div>
                                         <div class="mb-3">
@@ -378,22 +387,53 @@
         </div>
 
         <script>
-            document.getElementById('tipo_quarto_id').addEventListener('change', function() {
-                const selected = this.options[this.selectedIndex];
-                const preco = selected.getAttribute('data-preco');
-                const cobranca = selected.getAttribute('data-cobranca');
+    document.addEventListener('DOMContentLoaded', function () {
+        // Lida com todos os selects de tipo de quarto
+        const selects = document.querySelectorAll('.tipo_quarto_select, #tipo_quarto_id');
 
-                const precoInput = document.getElementById('preco_noite');
-                const cobrancaInput = document.getElementById('tipo_cobranca');
-                const wrapper = document.getElementById('preco-wrapper');
+        selects.forEach(select => {
+            select.addEventListener('change', function () {
+                const selectedOption = this.options[this.selectedIndex];
+                const preco = selectedOption.getAttribute('data-preco');
+                const cobranca = selectedOption.getAttribute('data-cobranca');
 
-                if (preco && wrapper) {
-                    precoInput.value = preco;
-                    cobrancaInput.value = cobranca;
-                    wrapper.style.display = 'block';
+                // Verifica se está no formulário de criação (IDs fixos)
+                if (this.id === 'tipo_quarto_id') {
+                    const precoInput = document.getElementById('preco_noite');
+                    const cobrancaInput = document.getElementById('tipo_cobranca');
+                    const wrapper = document.getElementById('preco-wrapper');
+
+                    if (precoInput && cobrancaInput && wrapper) {
+                        precoInput.value = preco || '';
+                        cobrancaInput.value = cobranca || '';
+                        wrapper.style.display = 'block';
+                    }
+                } else {
+                    // Está no formulário de edição (IDs dinâmicos por quarto)
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        const idMatch = modal.id.match(/\d+$/);
+                        if (idMatch) {
+                            const quartoId = idMatch[0];
+
+                            const precoInput = modal.querySelector(`#preco_noite_${quartoId}`);
+                            const cobrancaInput = modal.querySelector(`#tipo_cobranca_${quartoId}`);
+
+                            if (precoInput && cobrancaInput) {
+                                precoInput.value = preco || '';
+                                cobrancaInput.value = cobranca || '';
+                            }
+                        }
+                    }
                 }
             });
-        </script>
+        });
+    });
+</script>
+
+
+     
+
 
 
     </main>

@@ -9,25 +9,45 @@ use Illuminate\Http\Request;
 
 class QuartoController extends Controller
 {
-    public function index()
-    {
-        // Lista os quartos
-        $quartos = Quarto::all();
+public function index(Request $request)
+{
+    $query = Quarto::query();
 
-        // Lista os tipos de quartos (tipos que estarão no select)
-        $tipos = TipoQuarto::all();
-
-
-
-        // Passa os quartos e tipos de quartos para a view
-        return view('quartos.index', compact('quartos', 'tipos'));
+    // Filtro por status
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
     }
+
+    // Filtro por tipo de quarto (usa relacionamento)
+    if ($request->filled('tipo')) {
+        $query->whereHas('tipoQuarto', function ($q) use ($request) {
+            $q->where('nome', $request->tipo);
+        });
+    }
+
+    // Filtro por andar
+    if ($request->filled('andar')) {
+        $query->where('andar', $request->andar);
+    }
+
+    // Paginação ou ordenação, se desejar
+    $quartos = $query->with('tipoQuarto')->paginate(10);
+
+    // Tipos de quarto para o select
+    $tipos = TipoQuarto::all();
+
+
+    return view('quartos.index', compact('quartos', 'tipos'));
+}
+
 
     public function create()
     {
         $tipos = TipoQuarto::all();
         return view('quartos.create', compact('tipos'));
     }
+
+    
 
 
     public function store(Request $request)
@@ -82,7 +102,7 @@ class QuartoController extends Controller
         $request->validate([
             'numero' => 'required|max:10',
             'andar' => 'required|integer',
-            'tipo_quarto_id' => 'required|exists:tipo_quartos,id',
+            'tipo_quarto_id' => 'required|exists:tipos_quartos,id',
             'status' => 'required|in:Disponível,Reservado,Ocupado,Manutenção',
             'preco_noite' => 'nullable|numeric',
             'descricao' => 'nullable|string|max:255',
@@ -117,13 +137,27 @@ class QuartoController extends Controller
 
 
 
-    public function destroy(Quarto $quarto)
-    {
-        try {
-            $quarto->delete();
-            return redirect()->route('quartos.index')->with('success', 'Quarto excluído com sucesso.');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Erro ao excluir Quarto: ' . $e->getMessage());
-        }
+public function destroy(Quarto $quarto)
+{
+    try {
+        // 1. Zera o vínculo nas reservas
+        \App\Models\Reserva::where('quarto_id', $quarto->id)
+            ->update(['quarto_id' => null]);
+
+        // 2. (Opcional) Apaga hóspedes vinculados, ou quebra o vínculo
+        \App\Models\Hospede::where('quarto_id', $quarto->id)
+            ->update(['quarto_id' => null]); // ou ->delete()
+
+        // 3. Apaga o quarto
+        $quarto->delete();
+
+        return redirect()->route('quartos.index')
+            ->with('success', 'Quarto excluído com sucesso, e vínculos foram desfeitos.');
+    } catch (\Exception $e) {
+        return back()->with('error', 'Erro ao excluir Quarto: ' . $e->getMessage());
     }
+}
+
+
+
 }

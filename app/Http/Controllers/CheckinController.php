@@ -70,45 +70,13 @@ try {
     Quarto::where('id', $request->quarto_id)->update(['status' => 'Ocupado']);
     Reserva::where('id', $request->reserva_id)->update(['status' => 'hospedado']);
 
-    $numeroFormatado = str_pad(Fatura::max('id') + 1, 5, '0', STR_PAD_LEFT);
-
-    $fatura = Fatura::create([
-        'tipo_documento' => 'FT',
-        'serie' => 'A01',
-        'numero' => $numeroFormatado,
-        'data_emissao' => Carbon::now()->toDateString(),
-        'total' => floatval($reserva->valor_total ?? 0),
-        'valor_entregue' => floatval($reserva->valor_total ?? 0),
-        'troco' => 0,
-
-        'nome_cliente' => $reserva->cliente_nome,
-        'nif' => $reserva->cliente_nif ?? '999999990',
-        'telefone' => $reserva->cliente_telefone ?? null,
-
-        'estado_documento' => 'N',
-        'hash' => null,
-        'hash_control' => null,
-
-        'regime_autofaturacao' => false,
-        'regime_iva_caixa' => false,
-        'emitido_terceiros' => false,
-
-        'metodo_pagamento' => 'Dinheiro',
-        'codigo_cae' => '55101',
-        'mesa_id' => null,
-        'servico_id' => $checkin->id,
-    ]);
-
-    if (!empty($reserva->cliente_email)) {
-        Mail::to($reserva->cliente_email)->send(new ReciboFaturaMail($fatura));
-    }
 
     DB::commit();
 
     // Redireciona para a tela anterior e passa o link do PDF
     return redirect()->back()->with([
         'success' => 'Check-in realizado com sucesso!',
-        'fatura_pdf_id' => $fatura->id
+   
     ]);
 } catch (\Exception $e) {
     DB::rollBack();
@@ -117,8 +85,6 @@ try {
 
 
 }
-
-
 
     public function update(Request $request, $id)
     {

@@ -204,6 +204,7 @@ document.querySelectorAll('.form-checkin').forEach(form => {
 <script>
     var table = $('#Table').DataTable({
       responsive: true,
+            ordering: false,
       language: {
       url: "https://cdn.datatables.net/plug-ins/1.13.5/i18n/pt-BR.json",
         paginate: {

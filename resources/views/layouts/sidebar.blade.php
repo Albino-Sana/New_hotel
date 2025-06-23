@@ -19,7 +19,7 @@ $tipoUser = Auth::user()->tipo ?? null;
     </div>
 
     <hr class="horizontal dark mt-0">
-    <div class="collapse navbar-collapse w-auto h-100" id="sidenav-collapse-main" style="overflow-y: auto; overflow-x: hidden;">
+    <div class="collapse navbar-collapse w-auto h-auto">
         <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
@@ -133,7 +133,7 @@ $tipoUser = Auth::user()->tipo ?? null;
                 </x-slot>
             </x-dropdown>
 
-                        <li class="nav-item">
+            <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('pagamentos.*') ? 'active' : '' }}" href="{{ route('pagamentos.index') }}">
                     <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="fas fa-credit-card text-dark text-sm opacity-10"></i>
@@ -142,14 +142,25 @@ $tipoUser = Auth::user()->tipo ?? null;
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('documentos.*') ? 'active' : '' }}" href="#">
-                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="fas fa-file-alt text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Documentos</span>
-                </a>
-            </li>
+            <x-dropdown align="right" width="48">
+                <x-slot name="trigger">
+                    <a class="nav-link d-flex align-items-center {{ request()->routeIs('documentos.*') ? 'active' : '' }}" href="#" role="button">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-file-alt text-dark text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Documentos</span>
+                        <i class="fas fa-caret-down ms-2"></i>
+                    </a>
+                </x-slot>
+                <x-slot name="content">
+                    <a href="#" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
+                        Fatura Recibo
+                    </a>
+                    <a href="#" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
+                        Recibo
+                    </a>
+                </x-slot>
+            </x-dropdown>
             @endif
         </ul>
     </div>

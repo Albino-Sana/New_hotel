@@ -25,4 +25,6 @@ public function scopeOrderByName($query)
         return $this->belongsToMany(Hospede::class, 'hospede_servico')
             ->withTimestamps();
     }
+
+    
 }

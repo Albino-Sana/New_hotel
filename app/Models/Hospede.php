@@ -19,6 +19,8 @@ class Hospede extends Model
         'data_entrada',
         'data_saida',
         'quarto_id',
+        'preco_noite',
+        'tipo_cobranca',
         'valor_a_pagar',
         'status',
     ];
@@ -58,5 +60,9 @@ class Hospede extends Model
     public function checkoutHospede()
     {
         return $this->hasOne(CheckoutHospede::class);
+    }
+    public function tipo()
+    {
+        return $this->belongsTo(TipoQuarto::class, 'tipo_quarto_id');
     }
 }

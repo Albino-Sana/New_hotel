@@ -78,11 +78,12 @@
                                             </td>
 
                                             <td>
-                                                <span class="text-xs">{{ \Carbon\Carbon::parse($reserva->data_entrada)->format('d/m/Y') }}</span>
+                                                <span class="text-xs">{{ \Carbon\Carbon::parse($reserva->data_entrada)->format('d/m/Y H:i') }}
+                                                </span>
                                             </td>
 
                                             <td class="d-none d-lg-table-cell">
-                                                <span class="text-xs">{{ \Carbon\Carbon::parse($reserva->data_saida)->format('d/m/Y') }}</span>
+                                                <span class="text-xs"> {{ \Carbon\Carbon::parse($reserva->data_saida)->format('d/m/Y H:i') }}</span>
                                             </td>
 
                                             <td>
@@ -118,7 +119,7 @@
                                                     <!-- Botão Cancelar -->
                                                     <form action="{{ route('reservas.cancelar', $reserva) }}" method="POST" class="d-inline">
                                                         @csrf @method('DELETE')
-                                                        <button type="button"
+                                                        <button type="submit"
                                                             class="btn btn-sm btn-icon-only btn-outline-danger rounded-circle btn-delete"
                                                             data-bs-toggle="tooltip"
                                                             data-bs-placement="top"
@@ -131,7 +132,7 @@
 
                                                     <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" class="d-inline">
                                                         @csrf @method('DELETE')
-                                                        <button type="button"
+                                                        <button type="submit"
                                                             class="btn btn-sm btn-icon-only btn-outline-dark rounded-circle btn-delete-permanent"
                                                             data-bs-toggle="tooltip"
                                                             data-bs-placement="top"
@@ -228,9 +229,7 @@
 
 
                                                                             @foreach($quartos as $quarto)
-                                                                            <option value="{{ $quarto->id }}">
-                                                                                {{ $quarto->numero }} - {{ $quarto->status }}
-                                                                            </option>
+                                                                             <option value="{{ $quarto->id }}">Quarto {{ $quarto->numero }} - {{ $quarto->tipo->nome }}</option>
                                                                             @endforeach
                                                                         </select>
                                                                     </div>
@@ -240,40 +239,42 @@
                                                                         <input type="number" class="form-control" name="numero_pessoas" value="{{ $reserva->numero_pessoas }}" min="1" required>
                                                                     </div>
 
-                                                                    <div class="col-md-3 mb-3">
+                                                                    <div class="col-md-6 mb-3">
                                                                         <label><i class="fas fa-sign-in-alt me-1 text-secondary"></i>Data de Entrada</label>
-                                                                        <input type="date" class="form-control" name="data_entrada" value="{{ $reserva->data_entrada }}" required>
+                                                                        <input type="datetime-local" name="data_entrada" class="form-control"
+                                                                            value="{{ \Carbon\Carbon::parse($reserva->data_entrada)->format('Y-m-d\TH:i') }}" required>
                                                                     </div>
 
-                                                                    <div class="col-md-3 mb-3">
+                                                                    <div class="col-md-6 mb-3">
                                                                         <label><i class="fas fa-sign-out-alt me-1 text-secondary"></i>Data de Saída</label>
-                                                                        <input type="date" class="form-control" name="data_saida" value="{{ $reserva->data_saida }}" required>
+                                                                        <input type="datetime-local" name="data_saida" class="form-control"
+                                                                            value="{{ \Carbon\Carbon::parse($reserva->data_saida)->format('Y-m-d\TH:i') }}" required>
+                                                                    </div>
+
+                                                                </div>
+
+                                                                <!-- Observações -->
+                                                                <div class="card mb-3 shadow-sm">
+                                                                    <div class="card-header bg-light">
+                                                                        <strong><i class="fas fa-sticky-note me-2 text-primary"></i>Observações</strong>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <div class="mb-3">
+                                                                            <label><i class="fas fa-comment-dots me-1 text-secondary"></i>Informações Adicionais</label>
+                                                                            <textarea class="form-control" name="observacoes" rows="3">{{ $reserva->observacoes }}</textarea>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
-                                                            <!-- Observações -->
-                                                            <div class="card mb-3 shadow-sm">
-                                                                <div class="card-header bg-light">
-                                                                    <strong><i class="fas fa-sticky-note me-2 text-primary"></i>Observações</strong>
-                                                                </div>
-                                                                <div class="card-body">
-                                                                    <div class="mb-3">
-                                                                        <label><i class="fas fa-comment-dots me-1 text-secondary"></i>Informações Adicionais</label>
-                                                                        <textarea class="form-control" name="observacoes" rows="3">{{ $reserva->observacoes }}</textarea>
-                                                                    </div>
-                                                                </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                                    <i class="fas fa-times me-1"></i>Fechar
+                                                                </button>
+                                                                <button type="submit" class="btn btn-success">
+                                                                    <i class="fas fa-save me-1"></i>Salvar Alterações
+                                                                </button>
                                                             </div>
-                                                        </div>
-
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                                <i class="fas fa-times me-1"></i>Fechar
-                                                            </button>
-                                                            <button type="submit" class="btn btn-success">
-                                                                <i class="fas fa-save me-1"></i>Salvar Alterações
-                                                            </button>
-                                                        </div>
                                                     </form>
                                                 </div>
                                             </div>
@@ -472,13 +473,14 @@
 
                                         <div class="col-md-3 mb-3">
                                             <label><i class="fas fa-sign-in-alt me-1 text-secondary"></i>Data de Entrada</label>
-                                            <input type="date" name="data_entrada" class="form-control" required>
+                                            <input type="datetime-local" name="data_entrada" class="form-control" required>
                                         </div>
 
                                         <div class="col-md-3 mb-3">
                                             <label><i class="fas fa-sign-out-alt me-1 text-secondary"></i>Data de Saída</label>
-                                            <input type="date" name="data_saida" class="form-control" required>
+                                            <input type="datetime-local" name="data_saida" class="form-control" required>
                                         </div>
+
 
                                         <div class="col-md-6 mb-3">
                                             <label><i class="fas fa-users me-1 text-secondary"></i>Número de Pessoas</label>
@@ -496,6 +498,15 @@
                                         <div class="mb-3">
                                             <label><i class="fas fa-comment-dots me-1 text-secondary"></i>Observações</label>
                                             <textarea name="observacoes" class="form-control" rows="3"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input type="checkbox" name="gerar_fatura" id="gerar_fatura" class="form-check-input">
+                                            <label for="gerar_fatura" class="form-check-label">
+                                                <i class="fas fa-file-pdf me-1 text-secondary"></i>Gerar Fatura PDF automaticamente
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -516,6 +527,18 @@
 
         </div>
     </main>
+
+
+    </script>
+ @if (session('fatura_id'))
+    <script>
+        window.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                window.open("{{ route('reservas.fatura', session('fatura_id')) }}", '_blank');
+            }, 1000);
+        });
+    </script>
+@endif
 
     @include('layouts.customise')
 

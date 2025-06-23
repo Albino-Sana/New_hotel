@@ -359,13 +359,6 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-check mb-3">
-                                            <input class="form-check-input" type="checkbox" name="criar_fatura" id="criar_fatura" value="1" checked>
-                                            <label class="form-check-label text-primary fw-medium" for="criar_fatura">
-                                                Gerar fatura automaticamente após o check-in
-                                            </label>
-                                        </div>
-
                                     </div>
                                 </div>
 
@@ -416,19 +409,23 @@
 
         </div>
     </main>
+
+@if (session('recibo_estadia_id'))
+    <script>
+        window.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                window.open("{{ route('recibo.estadia', session('recibo_estadia_id')) }}", '_blank');
+            }, 1000);
+        });
+    </script>
+@endif
+
     @include('layouts.customise')
     <!--   Core JS Files   -->
     @include('components.js')
 
-    @if (session('fatura_id'))
-    <script>
-        window.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                window.open("{{ route('faturas.pdf', session('fatura_id')) }}", '_blank');
-            }, 1000); // aguarda 1 segundo para o SweetAlert aparecer primeiro
-        });
-    </script>
-    @endif
+
+
 
 </body>
 

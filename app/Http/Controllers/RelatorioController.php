@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf; // Se usar DomPDF
 use App\Models\Checkout;
 use App\Models\Reserva;
+use App\Models\Empresa;
 
 class RelatorioController extends Controller
 {
@@ -473,14 +474,16 @@ class RelatorioController extends Controller
         ];
     }
 
-    public function relatorioServicosExtrasPDF(Request $request)
+  public function relatorioServicosExtrasPDF(Request $request)
     {
         $periodo = $request->query('periodo', '7dias');
         $dados = $this->obterDadosServicosExtras($periodo);
+        $empresa = Empresa::firstOrFail(); // Busca o primeiro registro da tabela empresas
 
-        $pdf = Pdf::loadView('relatorios.servicos-extraspdf', compact('dados', 'periodo'));
+        $pdf = Pdf::loadView('relatorios.servicos-extraspdf', compact('dados', 'periodo', 'empresa'));
         return $pdf->download('relatorio_servicos_extras_' . $periodo . '.pdf');
     }
+
 
     private function obterDadosServicosExtras($periodo)
     {
@@ -659,8 +662,10 @@ class RelatorioController extends Controller
     {
         $periodo = $request->query('periodo', '7dias');
         $dados = $this->obterDadosFaturamento($periodo);
+          $empresa = Empresa::firstOrFail(); // Busca o primeiro registro da tabela empresas
 
-        $pdf = Pdf::loadView('relatorios.faturamentopdf', compact('dados', 'periodo'));
+
+        $pdf = Pdf::loadView('relatorios.faturamentopdf', compact('dados', 'periodo', 'empresa'));
         return $pdf->download('relatorio_faturamento_' . $periodo . '.pdf');
     }
 
@@ -670,11 +675,11 @@ class RelatorioController extends Controller
     {
         $periodo = $request->query('periodo', '7dias');
         $dados = $this->obterDadosReservasCancelamentos($periodo);
-
+           $empresa = Empresa::firstOrFail(); 
         // Depuração: Verificar os dados retornados
         // dd($dados);
 
-        $pdf = Pdf::loadView('relatorios.reservas-cancelamentospdf', compact('dados', 'periodo'));
+        $pdf = Pdf::loadView('relatorios.reservas-cancelamentospdf', compact('dados', 'periodo', 'empresa'));
         return $pdf->download('relatorio_reservas_cancelamentos_' . $periodo . '.pdf');
     }
 
@@ -792,7 +797,7 @@ class RelatorioController extends Controller
         $periodo = $request->query('periodo', '7dias');
         $dados = $this->obterDadosOcupacao($periodo);
 
-        $pdf = Pdf::loadView('relatorios.ocupacaopdf', compact('dados', 'periodo'));
+        $pdf = Pdf::loadView('relatorios.ocupacaopdf', compact('dados', 'periodo', 'empresa'));
         return $pdf->download('relatorio_ocupacao_' . $periodo . '.pdf');
     }
 

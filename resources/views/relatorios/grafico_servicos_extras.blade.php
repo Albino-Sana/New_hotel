@@ -36,7 +36,7 @@
         document.getElementById('grafico-titulo').textContent = 'Carregando...';
         document.getElementById('variacao-texto').textContent = 'Carregando...';
 
-        fetch(`/relatorios/dados-servicos-extras?periodo=${periodo}`)
+        fetch(`/sys/hotelaria/relatorios/741/dados-servicos-extras?periodo=${periodo}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('grafico-titulo').textContent = data.titulo;

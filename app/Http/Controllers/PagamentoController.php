@@ -143,12 +143,16 @@ class PagamentoController extends Controller
 
     public function fatura($id)
     {
-        $pagamento = Pagamento::with(['checkin.reserva', 'hospede'])->findOrFail($id);
-        $empresa = Empresa::firstOrFail();
+        try {
+            $pagamento = Pagamento::with(['checkin.reserva', 'hospede'])->findOrFail($id);
+            $empresa = Empresa::firstOrFail();
 
-        $pdf = Pdf::loadView('pagamentos.fatura', compact('pagamento', 'empresa'));
-
-        return $pdf->stream('fatura_pagamento_' . $pagamento->id . '.pdf');
+            $pdf = Pdf::loadView('pagamentos.fatura', compact('pagamento', 'empresa'));
+            return $pdf->stream('fatura_pagamento_' . $pagamento->id . '.pdf');
+        } catch (\Exception $e) {
+            Log::error('Erro ao gerar fatura: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Erro ao gerar fatura: ' . $e->getMessage());
+        }
     }
 
     public function destroy($id)
