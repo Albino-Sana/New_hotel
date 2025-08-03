@@ -97,12 +97,20 @@
                                                     <button type="button" class="btn btn-link text-danger text-xs mb-0 border-0 bg-transparent btn-delete">
                                                         Excluir
                                                     </button>
+
                                                 </form>
-                                                @if ($pagamento->status_pagamento === 'pago')
-                                                <a href="{{ route('pagamentos.fatura', $pagamento->id) }}" class="btn btn-link text-primary text-xs mb-0" target="_blank">
-                                                    Fatura
+
+                                                <!-- Imprimir Fatura -->
+                                                <a href="{{ route('pagamentos.fatura', $pagamento->id) }}"
+                                                    target="_blank"
+                                                    class="text-secondary font-weight-bold text-xs me-3"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="Imprimir Documento">
+                                                    <i class="bi bi-printer fa-2x"></i>
                                                 </a>
-                                                @endif
+                                                <!-- Reimprimir Fatura -->
+
+
                                             </td>
                                         </tr>
 
@@ -356,16 +364,16 @@
             </div>
         </div>
     </main>
-
     @if (session('fatura_id'))
     <script>
         window.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
-                window.open("{{ route('pagamentos.fatura', session('fatura_id')) }}", '_blank');
+                window.open("{{ route('pagamentos.fatura.pdf', session('fatura_id')) }}", '_blank');
             }, 1000);
         });
     </script>
     @endif
+
 
     @include('components.js')
     @include('layouts.customise')

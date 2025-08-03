@@ -11,7 +11,8 @@
 </head>
 <body>
     <div class="header">
-        <h2>Recibo Nº {{ $fatura->numero }}</h2>
+        <h2>Recibo Nº {{ $fatura->numero ?? $fatura->numero_fatura ?? '---' }}</h2>
+
         <p>Data: {{ $fatura->created_at->format('d/m/Y') }}</p>
     </div>
 

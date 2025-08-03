@@ -173,7 +173,7 @@
             </div>
             <div class="invoice-info">
                 <div class="invoice-title">FATURA-RECIBO</div>
-                <div class="invoice-number">N.º {{ $pagamento->id }}</div>
+                <div class="invoice-number">Numero.º {{ $pagamento->id }}</div>
                 <div><strong>Data de Emissão:</strong> {{ \Carbon\Carbon::parse($pagamento->data_pagamento)->format('d-m-Y') }}</div>
             </div>
         </div>

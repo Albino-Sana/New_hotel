@@ -97,7 +97,7 @@ $tipoUser = Auth::user()->tipo ?? null;
                 </a>
             </li>
 
-            @if ($tipoUser === 'Administrador')
+            @if ($tipoUser === 'Administrador' || $tipoUser === 'Recepcionista' || $tipoUser === 'Gerente de Caixa')
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('servicos_extras.*') ? 'active' : '' }}" href="{{ route('servicos_extras.index') }}">
                     <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -106,7 +106,9 @@ $tipoUser = Auth::user()->tipo ?? null;
                     <span class="nav-link-text ms-1">Serviços</span>
                 </a>
             </li>
+            @endif
 
+            @if ($tipoUser === 'Administrador')
             <x-dropdown align="right" width="48">
                 <x-slot name="trigger">
                     <a class="nav-link d-flex align-items-center {{ request()->routeIs('relatorios.*') ? 'active' : '' }}" href="#" role="button">
@@ -132,7 +134,9 @@ $tipoUser = Auth::user()->tipo ?? null;
                     </a>
                 </x-slot>
             </x-dropdown>
+            @endif
 
+            @if ($tipoUser === 'Administrador' || $tipoUser === 'Recepcionista' || $tipoUser === 'Gerente de Caixa')
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('pagamentos.*') ? 'active' : '' }}" href="{{ route('pagamentos.index') }}">
                     <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -152,15 +156,25 @@ $tipoUser = Auth::user()->tipo ?? null;
                         <i class="fas fa-caret-down ms-2"></i>
                     </a>
                 </x-slot>
+
                 <x-slot name="content">
-                    <a href="#" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
-                        Fatura Recibo
+                    <a href="{{ route('faturas.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
+                        Fatura
                     </a>
-                    <a href="#" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
-                        Recibo
+                    <a href="{{ route('faturasRecibo.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
+                        Fatura Recibo
                     </a>
                 </x-slot>
             </x-dropdown>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('saft.form') ? 'active' : '' }}" href="{{ route('saft.form') }}">
+                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-file-code text-dark text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Gerar SAFT</span>
+                </a>
+            </li>
             @endif
         </ul>
     </div>

@@ -249,23 +249,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.forEach(item => {
                     // Definir ícones de ação com tooltips
                     let acoes = `
-                        <button class="btn btn-sm btn-primary me-1" onclick="enviarEmail(${item.id}, '${item.tipo}')" data-bs-toggle="tooltip" data-bs-title="Enviar E-mail">
-                            <i class="fas fa-envelope"></i>
-                        </button>
+                   
                     `;
-                    if (item.tipo === 'Reserva') {
-                        acoes += `
-                            <button class="btn btn-sm btn-success" onclick="verRecibo(${item.id})" data-bs-toggle="tooltip" data-bs-title="Ver Recibo">
-                                <i class="fas fa-receipt"></i>
-                            </button>
-                        `;
-                    } else if (item.tipo === 'Check-in' || item.tipo === 'Hóspede Direto') {
-                        acoes += `
-                            <button class="btn btn-sm btn-info" onclick="verFatura(${item.id}, '${item.tipo}')" data-bs-toggle="tooltip" data-bs-title="Ver Fatura">
-                                <i class="fas fa-file-invoice"></i>
-                            </button>
-                        `;
-                    }
+         if (item.tipo === 'Reserva') {
+    acoes += `
+        <a href="/reservas/${item.id}/fatura" target="_blank" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Ver Recibo">
+            <i class="bi bi-printer"></i>
+        </a>
+    `;
+} else if (item.tipo === 'Check-in' || item.tipo === 'Hóspede Direto') {
+    acoes += `
+        <a href="${item.tipo === 'Hóspede Direto' ? '/hospedes/fatura/' + item.id : '/pagamentos/checkin/' + item.id + '/fatura'}"
+            target="_blank" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Ver Fatura">
+            <i class="bi bi-printer"></i>
+        </a>
+    `;
+}
+
 
                     tbody.append(`
                         <tr>
@@ -297,15 +297,28 @@ document.addEventListener('DOMContentLoaded', function() {
         alert(`Enviar e-mail para ${tipo} ID ${id}`);
     };
 
-    window.verFatura = function (id, tipo) {
-        // Lógica para exibir fatura
-        alert(`Visualizar fatura do ${tipo} ID ${id}`);
-    };
+window.verFatura = function (id, tipo) {
+    let url = '';
 
-    window.verRecibo = function (id) {
-        // Lógica para exibir recibo
-        alert(`Visualizar recibo da Reserva ID ${id}`);
-    };
+    if (tipo === 'Hóspede Direto') {
+        url = `/hospedes/fatura/${id}`;
+    } else if (tipo === 'Check-in') {
+        url = `/pagamentos/checkin/${id}/fatura`;
+    }
+
+    if (url) {
+        window.open(url, '_blank');
+    } else {
+        alert('Tipo não suportado para fatura.');
+    }
+};
+
+window.verRecibo = function (id) {
+    const url = `/reservas/${id}/fatura`;
+    window.open(url, '_blank');
+};
+
+
 });
 </script>
 

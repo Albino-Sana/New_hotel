@@ -9,6 +9,9 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Hospede;
+use App\Models\Fatura;
+use Illuminate\Support\Facades\Log;
+use App\Models\Empresa;
 
 class HospedeCadastrado extends Mailable
 {
@@ -16,16 +19,20 @@ class HospedeCadastrado extends Mailable
 
     public $hospede;
     public $dias;
-
-    public function __construct(Hospede $hospede, $dias)
+    public $fatura;
+    public $empresa;
+    public function __construct($fatura, $hospede, $empresa)
     {
+        $this->fatura = $fatura;
         $this->hospede = $hospede;
-        $this->dias = $dias;
+        $this->empresa = $empresa;
     }
+
 
     public function build()
     {
         return $this->subject('Confirmação de Hospedagem')
-                    ->view('emails.hospede_cadastrado');
+                    ->view('emails.hospede_cadastrado')
+                       ->with(['fatura' => $this->fatura]);
     }
 }

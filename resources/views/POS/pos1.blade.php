@@ -67,6 +67,49 @@
         z-index: 1050;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
+
+
+    .hover-effect:hover {
+        background-color: rgba(67, 97, 238, 0.05) !important;
+        transform: translateX(2px);
+        cursor: pointer;
+    }
+
+    .offcanvas-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .offcanvas-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .offcanvas-body::-webkit-scrollbar-thumb {
+        background: #4361ee;
+        border-radius: 10px;
+    }
+
+    .offcanvas-body::-webkit-scrollbar-thumb:hover {
+        background: #3a0ca3;
+    }
+
+    @keyframes pulse-border {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+        }
+    }
+
+    .pulsar-alerta {
+        animation: pulse-border 1.5s infinite;
+        border: 2px solid red !important;
+    }
 </style>
 
 <body>
@@ -79,11 +122,7 @@
                 <i class="fas fa-hotel me-2"></i>Hotel POS
             </a>
             <!-- Contador no meio -->
-            <div class="navbar-text text-white mx-auto">
-                <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
-                    <i class="fas fa-calendar-check me-2"></i>Reservas Pendentes: <span id="contadorReservas">0</span>
-                </span>
-            </div>
+
             <!-- Botão toggler para mobile -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -132,17 +171,259 @@
             </div>
             <div class="col-md-6 text-end">
                 <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-list"></i> Lista
+                    <!-- Botão Finalizar Pagamento -->
+                    <button class="btn btn-outline-primary btn-sm px-3 py-2 d-flex align-items-center position-relative
+    @if(isset($pagamentosPendentes) && $pagamentosPendentes->count()) pulsar-alerta @endif"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasPagamentos"
+                        style="border-radius: 8px; transition: all 0.3s;">
+                        <i class="fas fa-cash-register me-2"></i> Finalizar Pagamento
+
+                        @if(isset($pagamentosPendentes) && $pagamentosPendentes->count())
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ $pagamentosPendentes->count() }}
+                        </span>
+                        @endif
                     </button>
-                    <button type="button" class="btn btn-primary btn-sm">
-                        <i class="fas fa-th-large"></i> Grid
-                    </button>
+
+                    <!-- Offcanvas de Pagamentos Pendentes -->
+                    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasPagamentos"
+                        aria-labelledby="offcanvasPagamentosLabel"
+                        style="width: 400px;">
+                        <div class="offcanvas-header" style="background: linear-gradient(135deg, #4361ee, #3a0ca3);">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-money-bill-wave me-3 text-white fs-4"></i>
+                                <h5 class="offcanvas-title text-white mb-0" id="offcanvasPagamentosLabel">
+                                    Pagamentos Pendentes
+                                    <span class="badge bg-white text-primary ms-2">
+                                        {{ isset($pagamentosPendentes) ? $pagamentosPendentes->count() : 0 }}
+                                    </span>
+
+                                </h5>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+                        </div>
+                        <div class="offcanvas-body">
+                            @if(isset($pagamentosPendentes) && $pagamentosPendentes->count())
+                            <div class="list-group list-group-flush" id="pagamentosPendentesList">
+                                @foreach($pagamentosPendentes as $pagamento)
+                                <div class="list-group-item border-0 p-3 hover-effect"
+                                    style="border-bottom: 1px solid rgba(0,0,0,0.05) !important;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center" style="width: 70%;">
+                                            <div class="avatar bg-light-primary rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                                style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 text-dark fw-semibold">
+                                                    {{ $pagamento->hospede->nome ?? $pagamento->checkin->reserva->cliente_nome }}
+                                                </h6>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge me-2"
+                                                        style="background-color: #fff3cd; color: #664d03; font-size: 0.7rem;">
+                                                        {{ ucfirst($pagamento->status_pagamento) }}
+                                                    </span>
+                                                    <small class="text-muted">
+                                                        <i class="far fa-clock me-1"></i>
+                                                        {{ \Carbon\Carbon::parse($pagamento->created_at)->format('H:i') }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-sm d-flex align-items-center justify-content-center toggle-edit-form"
+                                                style="background-color: #e9ecef; width: 32px; height: 32px; border-radius: 8px;"
+                                                title="Editar Pagamento"
+                                                data-pagamento-id="{{ $pagamento->id }}">
+                                                <i class="fas fa-edit text-primary"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Formulário de Edição (inicialmente oculto) -->
+                                    <div class="edit-form-container mt-3" id="editForm{{ $pagamento->id }}" style="display: none;">
+                                        <form action="{{ route('pagamentos.update', $pagamento->id) }}" method="POST" class="border-top pt-3">
+                                            @csrf
+                                            @method('PUT')
+
+                                            <div class="row g-3">
+                                                <!-- Origem -->
+                                                <div class="col-12">
+                                                    <label class="form-label">Origem do Pagamento</label>
+                                                    <select name="origem" id="tipo_origem_edit{{ $pagamento->id }}" class="form-select" onchange="toggleEditSelects({{ $pagamento->id }})" required {{ $pagamento->checkin_id ? 'disabled' : '' }}>
+                                                        <option value="">-- Selecione --</option>
+                                                        <option value="checkin" {{ $pagamento->checkin_id ? 'selected' : '' }}>Check-in</option>
+                                                        <option value="hospede" {{ $pagamento->hospede_id ? 'selected' : '' }}>Hóspede</option>
+                                                    </select>
+                                                    @if($pagamento->checkin_id)
+                                                    <input type="hidden" name="origem" value="checkin">
+                                                    @elseif($pagamento->hospede_id)
+                                                    <input type="hidden" name="origem" value="hospede">
+                                                    @endif
+                                                </div>
+
+                                                <!-- Select Check-in -->
+                                                <div class="col-12" id="checkin_select_edit{{ $pagamento->id }}" style="display: {{ $pagamento->checkin_id ? 'block' : 'none' }};">
+                                                    <label class="form-label">Check-in</label>
+                                                    <select name="checkin_id" class="form-select" {{ $pagamento->checkin_id ? 'disabled' : '' }} onchange="handleEditSelectChange({{ $pagamento->id }}, 'checkin')">
+                                                        <option value="">-- Nenhum --</option>
+                                                        @foreach ($checkins as $checkin)
+                                                        <option value="{{ $checkin->id }}" {{ $pagamento->checkin_id == $checkin->id ? 'selected' : '' }}>
+                                                            #{{ $checkin->id }} - {{ $checkin->reserva->cliente_nome ?? 'Sem Nome' }}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
+                                                    @if($pagamento->checkin_id)
+                                                    <input type="hidden" name="checkin_id" value="{{ $pagamento->checkin_id }}">
+                                                    @endif
+                                                </div>
+
+                                                <!-- Select Hóspede -->
+                                                <div class="col-12" id="hospede_select_edit{{ $pagamento->id }}" style="display: {{ $pagamento->hospede_id && !$pagamento->checkin_id ? 'block' : 'none' }};">
+                                                    <label class="form-label">Hóspede</label>
+                                                    <select name="hospede_id" class="form-select" {{ $pagamento->checkin_id ? 'disabled' : '' }} onchange="handleEditSelectChange({{ $pagamento->id }}, 'hospede')">
+                                                        <option value="">-- Nenhum --</option>
+                                                        @foreach ($hospedes as $hospede)
+                                                        <option value="{{ $hospede->id }}" {{ $pagamento->hospede_id == $hospede->id ? 'selected' : '' }}>
+                                                            #{{ $hospede->id }} - {{ $hospede->nome }}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
+                                                    @if($pagamento->hospede_id)
+                                                    <input type="hidden" name="hospede_id" value="{{ $pagamento->hospede_id }}">
+                                                    @endif
+                                                </div>
+
+                                                <!-- Valor -->
+                                                <div class="col-12">
+                                                    <label class="form-label">Valor</label>
+                                                    <input type="number" step="0.01" name="valor" id="valor_edit{{ $pagamento->id }}" value="{{ $pagamento->valor }}" class="form-control" required>
+                                                </div>
+
+                                                <!-- Status -->
+                                                <div class="col-12">
+                                                    <label class="form-label">Estado</label>
+                                                    <select name="status_pagamento" class="form-select" required>
+                                                        <option value="pendente" {{ $pagamento->status_pagamento == 'pendente' ? 'selected' : '' }}>Pendente</option>
+                                                        <option value="pago" {{ $pagamento->status_pagamento == 'pago' ? 'selected' : '' }}>Pago</option>
+                                                        <option value="falhou" {{ $pagamento->status_pagamento == 'falhou' ? 'selected' : '' }}>Falhou</option>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Método -->
+                                                <div class="col-12">
+                                                    <label class="form-label">Forma de Pagamento</label>
+                                                    <select name="metodo_pagamento" class="form-select" required>
+                                                        <option value="">Selecione...</option>
+                                                        @foreach($metodos_pagamento as $metodo)
+                                                        <option value="{{ $metodo->designacao }}" {{ $pagamento->metodo_pagamento == $metodo->designacao ? 'selected' : '' }}>
+                                                            {{ $metodo->designacao }}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex justify-content-end mt-3">
+                                                <button type="button" class="btn btn-outline-secondary me-2 cancel-edit">Cancelar</button>
+                                                <button type="submit" class="btn btn-primary">Atualizar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            @else
+                            <div class="d-flex flex-column align-items-center justify-content-center" style="height: calc(100% - 60px);">
+                                <div class="bg-light rounded-circle p-4 mb-3">
+                                    <i class="fas fa-money-bill-wave text-muted" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5 class="text-muted mb-2">Nenhum pagamento pendente</h5>
+                            </div>
+                            @endif
+                        </div>
+
+                        <style>
+                            .edit-form-container {
+                                transition: all 0.3s ease;
+                                overflow: hidden;
+                            }
+
+                            .hover-effect:hover {
+                                background-color: rgba(67, 97, 238, 0.05) !important;
+                            }
+                        </style>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Fecha todos os formulários abertos
+                                function closeAllEditForms() {
+                                    document.querySelectorAll('.edit-form-container').forEach(form => {
+                                        form.style.display = 'none';
+                                    });
+                                }
+
+                                // Abre o formulário de edição
+                                function openEditForm(pagamentoId) {
+                                    const form = document.getElementById(`editForm${pagamentoId}`);
+                                    if (form) {
+                                        form.style.display = 'block';
+                                        form.scrollIntoView({
+                                            behavior: 'smooth',
+                                            block: 'nearest'
+                                        });
+                                    }
+                                }
+
+                                // Event listeners para os botões de edição
+                                document.querySelectorAll('.toggle-edit-form').forEach(button => {
+                                    button.addEventListener('click', function() {
+                                        const pagamentoId = this.getAttribute('data-pagamento-id');
+                                        const form = document.getElementById(`editForm${pagamentoId}`);
+
+                                        if (form.style.display === 'none') {
+                                            closeAllEditForms();
+                                            openEditForm(pagamentoId);
+                                        } else {
+                                            form.style.display = 'none';
+                                        }
+                                    });
+                                });
+
+                                // Event listeners para os botões de cancelar
+                                document.querySelectorAll('.cancel-edit').forEach(button => {
+                                    button.addEventListener('click', function() {
+                                        const formContainer = this.closest('.edit-form-container');
+                                        if (formContainer) {
+                                            formContainer.style.display = 'none';
+                                        }
+                                    });
+                                });
+                            });
+
+                            // Funções para manipulação dos selects (mantidas do seu código original)
+                            function toggleEditSelects(pagamentoId) {
+                                // Sua implementação existente
+                            }
+
+                            function handleEditSelectChange(pagamentoId, type) {
+                                // Sua implementação existente
+                            }
+                        </script>
+
+                        <div class="offcanvas-footer p-3 border-top" style="background-color: #fff;">
+                            <button class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center"
+                                data-bs-dismiss="offcanvas">
+                                <i class="fas fa-check-circle me-2"></i> Fechar
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
-                <button class="btn btn-primary btn-sm ms-2">
-                    <i class="fas fa-filter"></i> Filtrar
-                </button>
             </div>
+
+
         </div>
 
         <div class="row g-3">
@@ -154,16 +435,32 @@
                     style="cursor: pointer;"
                     @endif>
 
+
                     <!-- Cabeçalho com status -->
                     <div class="card-header p-3 bg-gradient-{{ 
-                    $quarto->status == 'Disponível' ? 'success' : 
-                    ($quarto->status == 'Reservado' ? 'warning' : 'danger') 
-                }} text-dark">
+                            $quarto->status == 'Disponível' ? 'success' : 
+                            ($quarto->status == 'Reservado' ? 'warning' : 'danger') 
+                        }} text-dark">
                         <div class="d-flex justify-content-between align-items-center">
                             <h6 class="mb-0 text-dark fw-bold">Quarto #{{ $quarto->numero }}</h6>
-                            <span class="badge bg-white text-dark rounded-pill">{{ $quarto->andar }}º Andar</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-white text-dark rounded-pill">{{ $quarto->andar }}º Andar</span>
+
+                                @if(in_array(strtolower($quarto->status), ['ocupado', 'reservado']))
+                                <!-- Botão de detalhes -->
+                                <button class="btn btn-sm btn-outline-light border-0 shadow-none p-1 px-2 rounded-circle"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalDetalhesQuarto{{ $quarto->id }}"
+                                    title="Ver detalhes do quarto">
+                                    <i class="fas fa-info-circle text-white"></i>
+                                </button>
+                                @endif
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Modal de detalhes -->
+
 
                     <!-- Corpo do card -->
                     <div class="card-body p-3">
@@ -246,6 +543,37 @@
                     </div>
                 </div>
             </div>
+
+            <div class="modal fade" id="modalDetalhesQuarto{{ $quarto->id }}" tabindex="-1" aria-labelledby="detalhesQuartoLabel{{ $quarto->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title text-white" id="detalhesQuartoLabel{{ $quarto->id }}">Detalhes do Quarto #{{ $quarto->numero }}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Status:</strong> {{ $quarto->status }}</li>
+                                <li class="list-group-item"><strong>Andar:</strong> {{ $quarto->andar }}</li>
+                                <li class="list-group-item"><strong>Tipo:</strong> {{ $quarto->tipo->nome }}</li>
+                                <li class="list-group-item"><strong>Preço:</strong> {{ number_format($quarto->preco_noite, 2, ',', '.') }} Kz</li>
+                                <li class="list-group-item"><strong>Cobrança:</strong> {{ $quarto->tipo_cobranca }}</li>
+                                @if($quarto->checkin)
+                                <li class="list-group-item"><strong>Check-in:</strong> {{ $quarto->checkin->created_at->format('d/m/Y H:i') }}</li>
+                                @endif
+                                @if($quarto->hospede)
+                                <li class="list-group-item"><strong>Hóspede:</strong> {{ $quarto->hospede->nome }}</li>
+                                @endif
+                                <!-- Adicione outras informações conforme necessário -->
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             @endforeach
         </div>
 
@@ -279,6 +607,8 @@
             </div>
         </div>
     </div>
+
+
 
     <!-- Modal de Histórico -->
     <div class="modal fade" id="historicoModal" tabindex="-1" aria-labelledby="historicoModalLabel" aria-hidden="true">
@@ -954,26 +1284,11 @@
         </div>
     </div>
 
+    @include('components.pagamento_open')
+    @include('components.reservas_open')
+    @include('components.hospede_open')
+    @include('components.recibo_estadia_open')
 
-    @if (session('fatura_id'))
-    <script>
-        window.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                window.open("{{ route('reservas.fatura', session('fatura_id')) }}", '_blank');
-            }, 1000); // Espera 1s antes de abrir
-        });
-    </script>
-    @endif
-
-    @if (session('recibo_estadia_id'))
-    <script>
-        window.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                window.open("{{ route('recibo.estadia', session('recibo_estadia_id')) }}", '_blank');
-            }, 1000);
-        });
-    </script>
-    @endif
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 
 
-class Fatura extends Model
+class FaturaRecibo extends Model
 {
     use HasFactory;
 
+    protected $table = 'fatura_recibos';
     protected $fillable = [
         'tipo_documento',
         'serie',
@@ -33,19 +33,9 @@ class Fatura extends Model
         'codigo_cae',
         'servico_id',
         'reserva_id',
-        'hospede_id'
+        'hospede_id',
+        'pagamento_id'
     ];
-public function operador()
-{
-    return $this->belongsTo(User::class, 'user_id');
-}
-
-    public function empresa()
-    {
-        return $this->belongsTo(Empresa::class, 'empresa_id');
-    }
-
-
 
     public function reserva()
     {
@@ -55,4 +45,14 @@ public function operador()
     {
         return $this->belongsTo(Hospede::class);
     }
+    public function pagamento()
+{
+    return $this->belongsTo(Pagamento::class);
+}
+
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_id');
+    }
+
 }

@@ -2,74 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Fatura;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Fatura;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\Empresa;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
 
+use App\Models\Reserva;
 class FaturaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-public function index()
+    //
+    public function index()
 {
-    $faturas = Fatura::with('checkin')->latest()->get();
-    return view('faturas.index', compact('faturas'));
+    $faturas = Fatura::with('operador')->orderBy('data_emissao', 'desc')->get();
+
+    return view('documentos.fatura.index', compact('faturas'));
 }
 
-public function gerarPdf($id)
+
+
+
+public function verFatura($id)
 {
     $fatura = Fatura::findOrFail($id);
-    $pdf = Pdf::loadView('faturas.pdf', compact('fatura')); // View faturas/pdf.blade.php
-    return $pdf->download("fatura_{$fatura->numero}.pdf");
+    $empresa = Empresa::firstOrFail();
+    $reserva = Reserva::find($fatura->reserva_id); // <- Corrigir aqui
+
+    $pdf = Pdf::loadView('pdf.faturas.reserva', compact('fatura', 'empresa', 'reserva'));
+    return $pdf->stream('fatura_reserva_' . $fatura->numero . '.pdf');
 }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+public function download($id)
+{
+    $fatura = Fatura::findOrFail($id);
+    $empresa = Empresa::firstOrFail();
+$reserva = $fatura->reserva ?? null;
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+$pdf = Pdf::loadView('pdf.faturas.reserva', compact('fatura', 'empresa', 'reserva'));
+    return PDF::loadView('pdf.faturas.reserva', compact('fatura', 'empresa'))
+        ->download("fatura_{$fatura->numero}.pdf");
+}
+public function enviarEmail(Request $request, $id)
+{
+    $request->validate(['email' => 'required|email']);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Fatura $fatura)
-    {
-        //
-    }
+    $fatura = Fatura::findOrFail($id);
+    $empresa = Empresa::firstOrFail();
+    $email = $request->email;
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Fatura $fatura)
-    {
-        //
-    }
+    Mail::to($email)->send(new \App\Mail\FaturaMail($fatura, $empresa));
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Fatura $fatura)
-    {
-        //
-    }
+    return back()->with('success', 'Fatura enviada com sucesso!');
+}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Fatura $fatura)
-    {
-        //
-    }
+
+
+public function destroy($id)
+{
+    $fatura = Fatura::findOrFail($id);
+    $fatura->estado_documento = 'A'; // A = Anulado
+    $fatura->save();
+
+    return back()->with('success', 'Fatura anulada com sucesso!');
+}
+
 }

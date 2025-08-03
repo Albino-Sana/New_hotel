@@ -387,54 +387,49 @@
         </div>
 
         <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Lida com todos os selects de tipo de quarto
-        const selects = document.querySelectorAll('.tipo_quarto_select, #tipo_quarto_id');
+            document.addEventListener('DOMContentLoaded', function() {
+                // Lida com todos os selects de tipo de quarto
+                const selects = document.querySelectorAll('.tipo_quarto_select, #tipo_quarto_id');
 
-        selects.forEach(select => {
-            select.addEventListener('change', function () {
-                const selectedOption = this.options[this.selectedIndex];
-                const preco = selectedOption.getAttribute('data-preco');
-                const cobranca = selectedOption.getAttribute('data-cobranca');
+                selects.forEach(select => {
+                    select.addEventListener('change', function() {
+                        const selectedOption = this.options[this.selectedIndex];
+                        const preco = selectedOption.getAttribute('data-preco');
+                        const cobranca = selectedOption.getAttribute('data-cobranca');
 
-                // Verifica se está no formulário de criação (IDs fixos)
-                if (this.id === 'tipo_quarto_id') {
-                    const precoInput = document.getElementById('preco_noite');
-                    const cobrancaInput = document.getElementById('tipo_cobranca');
-                    const wrapper = document.getElementById('preco-wrapper');
+                        // Verifica se está no formulário de criação (IDs fixos)
+                        if (this.id === 'tipo_quarto_id') {
+                            const precoInput = document.getElementById('preco_noite');
+                            const cobrancaInput = document.getElementById('tipo_cobranca');
+                            const wrapper = document.getElementById('preco-wrapper');
 
-                    if (precoInput && cobrancaInput && wrapper) {
-                        precoInput.value = preco || '';
-                        cobrancaInput.value = cobranca || '';
-                        wrapper.style.display = 'block';
-                    }
-                } else {
-                    // Está no formulário de edição (IDs dinâmicos por quarto)
-                    const modal = this.closest('.modal');
-                    if (modal) {
-                        const idMatch = modal.id.match(/\d+$/);
-                        if (idMatch) {
-                            const quartoId = idMatch[0];
-
-                            const precoInput = modal.querySelector(`#preco_noite_${quartoId}`);
-                            const cobrancaInput = modal.querySelector(`#tipo_cobranca_${quartoId}`);
-
-                            if (precoInput && cobrancaInput) {
+                            if (precoInput && cobrancaInput && wrapper) {
                                 precoInput.value = preco || '';
                                 cobrancaInput.value = cobranca || '';
+                                wrapper.style.display = 'block';
+                            }
+                        } else {
+                            // Está no formulário de edição (IDs dinâmicos por quarto)
+                            const modal = this.closest('.modal');
+                            if (modal) {
+                                const idMatch = modal.id.match(/\d+$/);
+                                if (idMatch) {
+                                    const quartoId = idMatch[0];
+
+                                    const precoInput = modal.querySelector(`#preco_noite_${quartoId}`);
+                                    const cobrancaInput = modal.querySelector(`#tipo_cobranca_${quartoId}`);
+
+                                    if (precoInput && cobrancaInput) {
+                                        precoInput.value = preco || '';
+                                        cobrancaInput.value = cobranca || '';
+                                    }
+                                }
                             }
                         }
-                    }
-                }
+                    });
+                });
             });
-        });
-    });
-</script>
-
-
-     
-
-
+        </script>
 
     </main>
     @include('layouts.customise')

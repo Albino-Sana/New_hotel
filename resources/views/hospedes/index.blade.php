@@ -59,9 +59,9 @@
                                                 <div class="d-flex align-items-center">
                                                     <div class="avatar avatar-sm me-2">
                                                         <span class="avatar-initial rounded-circle bg-gradient-{{ 
-                            $hospede->status === 'hospedado' ? 'info' : 
-                            ($hospede->status === 'finalizado' ? 'success' : 'secondary') 
-                        }} text-white">
+                                                                $hospede->status === 'hospedado' ? 'info' : 
+                                                                ($hospede->status === 'finalizado' ? 'success' : 'secondary') 
+                                                            }} text-white">
                                                             {{ substr($hospede->nome, 0, 1) }}
                                                         </span>
                                                     </div>
@@ -367,15 +367,13 @@
                                 </table>
                             </div>
 
-                            <div class="px-3 pt-2">
-                                {{ $hospedes->links() }}
-                            </div>
                         </div>
 
 
                     </div>
                 </div>
             </div>
+
             <!-- Modal de Adicionar Hóspede -->
             <div class="modal fade" id="modalNovoHospede" tabindex="-1" aria-labelledby="modalAdicionarHospedeLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -524,6 +522,17 @@
             }
         });
     </script>
+
+    @if (session('fatura_id'))
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                window.open("{{ route('hospedes.fatura', session('fatura_id')) }}", '_blank');
+            }, 1000);
+        });
+    </script>
+    @endif
+
 
     @include('layouts.customise')
     <!--   Core JS Files   -->

@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fatura Reserva #{{ $reserva->id }}</title>
+    <title>Fatura Reserva #{{ $fatura->reserva->id ?? '---' }}</title>
+
     <style>
         @page {
             size: A4;
             margin: 1.5cm;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
             line-height: 1.4;
             font-size: 12px;
         }
-        
+
         .container {
             max-width: 100%;
             padding: 0;
         }
-        
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -29,105 +31,107 @@
             border-bottom: 2px solid #2c3e50;
             padding-bottom: 15px;
         }
-        
+
         .logo {
             width: 150px;
         }
-        
+
         .invoice-info {
             text-align: right;
         }
-        
+
         .invoice-title {
             font-size: 24px;
             font-weight: bold;
             color: #2c3e50;
             margin-bottom: 5px;
         }
-        
+
         .invoice-number {
             font-size: 18px;
             color: #7f8c8d;
         }
-        
-        .company-info, .client-info {
+
+        .company-info,
+        .client-info {
             margin-bottom: 20px;
             padding: 15px;
             border-radius: 5px;
         }
-        
+
         .company-info {
             background-color: #f8f9fa;
             border-left: 4px solid #3498db;
         }
-        
+
         .client-info {
             background-color: #f8f9fa;
             border-left: 4px solid #e67e22;
         }
-        
+
         .info-title {
             font-weight: bold;
             color: #2c3e50;
             margin-bottom: 5px;
         }
-        
+
         .details-table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
         }
-        
+
         .details-table th {
             background-color: #2c3e50;
             color: white;
             padding: 8px;
             text-align: left;
         }
-        
+
         .details-table td {
             padding: 8px;
             border-bottom: 1px solid #ddd;
         }
-        
+
         .details-table tr:nth-child(even) {
             background-color: #f8f9fa;
         }
-        
+
         .totals {
             display: flex;
             justify-content: flex-end;
             margin-top: 20px;
         }
-        
+
         .totals-table {
             width: 300px;
             border-collapse: collapse;
         }
-        
-        .totals-table th, .totals-table td {
+
+        .totals-table th,
+        .totals-table td {
             padding: 8px;
             text-align: right;
         }
-        
+
         .totals-table th {
             background-color: #2c3e50;
             color: white;
         }
-        
+
         .grand-total {
             font-weight: bold;
             font-size: 14px;
             background-color: #ecf0f1 !important;
         }
-        
+
         .reservation-info {
             margin-top: 30px;
             padding: 15px;
             background-color: #f8f9fa;
             border-radius: 5px;
         }
-        
+
         .footer {
             margin-top: 40px;
             padding-top: 10px;
@@ -136,7 +140,7 @@
             color: #7f8c8d;
             text-align: center;
         }
-        
+
         .qr-code {
             width: 80px;
             height: 80px;
@@ -148,7 +152,7 @@
             font-size: 10px;
             color: #999;
         }
-        
+
         .signature-area {
             margin-top: 40px;
             padding-top: 20px;
@@ -159,6 +163,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -168,11 +173,11 @@
             </div>
             <div class="invoice-info">
                 <div class="invoice-title">FATURA-RECIBO</div>
-                <div class="invoice-number">Reserva #{{ $reserva->id }}</div>
+                <div class="invoice-number">Numero #{{ $fatura->numero }}</div>
                 <div><strong>Data de Emissão:</strong> {{ \Carbon\Carbon::now()->format('d-m-Y') }}</div>
             </div>
         </div>
-        
+
         <div class="company-info">
             <div class="info-title">Dados do Estabelecimento</div>
             <div><strong>Nome:</strong> {{ $empresa->nome_empresa ?? 'Não definido' }}</div>
@@ -180,19 +185,20 @@
             <div><strong>Telefone:</strong> {{ $empresa->telefone ?? 'N/D' }} | <strong>E-mail:</strong> {{ $empresa->email ?? 'N/D' }}</div>
             <div><strong>Contribuinte (NIF):</strong> {{ $empresa->NIF ?? '9999999' }}</div>
         </div>
-        
+
         <div class="client-info">
             <div class="info-title">Cliente</div>
             <div><strong>Nome:</strong> {{ $reserva->cliente_nome ?? 'N/D' }}</div>
             <div><strong>Documento:</strong> {{ $reserva->cliente_documento ?? 'N/D' }}</div>
-            @if($reserva->cliente_email)
-                <div><strong>Email:</strong> {{ $reserva->cliente_email }}</div>
+            @if(optional($fatura->reserva)->cliente_email)
+            <div><strong>Email:</strong> {{ $fatura->reserva->cliente_email }}</div>
             @endif
-            @if($reserva->cliente_telefone)
-                <div><strong>Telefone:</strong> {{ $reserva->cliente_telefone }}</div>
+
+            @if(optional( $fatura->resera)->cliente_telefone)
+            <div><strong>Telefone:</strong> {{ $fatura->reserva->cliente_telefone }}</div>
             @endif
         </div>
-        
+
         <table class="details-table">
             <thead>
                 <tr>
@@ -201,59 +207,97 @@
                 </tr>
             </thead>
             <tbody>
+                @if($fatura->reserva)
                 <tr>
                     <td>Quarto</td>
-                    <td>Quarto {{ $reserva->quarto->numero }} - {{ $reserva->quarto->tipo->nome }}</td>
+                    <td>
+                        Quarto {{ optional($fatura->reserva->quarto)->numero ?? 'N/D' }} -
+                        {{ optional($fatura->reserva->quarto->tipo)->nome ?? 'N/D' }}
+                    </td>
                 </tr>
                 <tr>
                     <td>Data de Entrada</td>
-                    <td>{{ \Carbon\Carbon::parse($reserva->data_entrada)->format('d/m/Y H:i') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($fatura->reserva->data_entrada)->format('d/m/Y H:i') }}</td>
                 </tr>
                 <tr>
                     <td>Data de Saída</td>
-                    <td>{{ \Carbon\Carbon::parse($reserva->data_saida)->format('d/m/Y H:i') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($fatura->reserva->data_saida)->format('d/m/Y H:i') }}</td>
                 </tr>
                 <tr>
                     <td>Número de Pessoas</td>
-                    <td>{{ $reserva->numero_pessoas }}</td>
+                    <td>{{ $fatura->reserva->numero_pessoas }}</td>
                 </tr>
-                @if($reserva->observacoes)
+                @if($fatura->reserva->observacoes)
                 <tr>
                     <td>Observações</td>
-                    <td>{{ $reserva->observacoes }}</td>
+                    <td>{{ $fatura->reserva->observacoes }}</td>
+                </tr>
+                @endif
+                @elseif($fatura->hospede)
+                <tr>
+                    <td>Quarto</td>
+                    <td>
+                        Quarto {{ optional($fatura->hospede->quarto)->numero ?? 'N/D' }} -
+                        {{ optional($fatura->hospede->quarto->tipo)->nome ?? 'N/D' }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Data de Entrada</td>
+                    <td>{{ \Carbon\Carbon::parse($fatura->hospede->data_entrada)->format('d/m/Y H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Data de Saída</td>
+                    <td>{{ \Carbon\Carbon::parse($fatura->hospede->data_saida)->format('d/m/Y H:i') }}</td>
+                </tr>
+                <tr>
+                    <td>Número de Pessoas</td>
+                    <td>{{ $fatura->hospede->numero_pessoas }}</td>
+                </tr>
+                @if($fatura->hospede->observacoes)
+                <tr>
+                    <td>Observações</td>
+                    <td>{{ $fatura->hospede->observacoes }}</td>
+                </tr>
+                @endif
+                @else
+                <tr>
+                    <td colspan="2"><em>Sem dados de reserva ou hóspede vinculados à fatura.</em></td>
                 </tr>
                 @endif
             </tbody>
+
         </table>
-        
+
         <div class="totals">
             <table class="totals-table">
                 <tr class="grand-total">
                     <th>VALOR TOTAL</th>
-                    <td>{{ number_format($reserva->valor_total, 2, ',', '.') }} KZ</td>
+                    <td>{{ number_format($fatura->total ?? $fatura->valor_total ?? 0, 2, ',', '.') }} KZ</td>
                 </tr>
             </table>
         </div>
-        
+
         <div class="reservation-info">
-            <p><em>Reserva registrada em: {{ \Carbon\Carbon::now()->format('d-m-Y') }}</em></p>
+            <p><em>Documento registrado em: {{ \Carbon\Carbon::parse($fatura->data_emissao ?? now())->format('d-m-Y') }}</em></p>
             <p><strong>Comentário:</strong> {{ $empresa->comentario_cabecalho ?? 'Obrigado pela sua preferência!' }}</p>
         </div>
-        
+
         <div class="signature-area">
             <p>Assinatura do Responsável</p>
             <div style="height: 50px;"></div>
             <p>_________________________________________</p>
         </div>
-        
+
         <div class="qr-code">
             [QR CODE]
         </div>
-        
+
         <div class="footer">
             <p>Processado por {{ $empresa->nome ?? 'Sistema de Hotelaria' }} - Versão {{ $empresa->versao_produto ?? 'N/D' }}</p>
             <p>Este documento é gerado eletronicamente</p>
         </div>
+
     </div>
 </body>
+
 </html>

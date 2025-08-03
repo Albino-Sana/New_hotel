@@ -27,7 +27,10 @@ protected $dates = ['data_pagamento'];
 protected $casts = [
     'data_pagamento' => 'datetime',
 ];
-
+public function faturaRecibo()
+{
+    return $this->hasOne(FaturaRecibo::class);
+}
 public function checkin()
 {
     return $this->belongsTo(Checkin::class);
@@ -38,5 +41,5 @@ public function hospede()
     return $this->belongsTo(Hospede::class);
 }
 
-}
 
+}

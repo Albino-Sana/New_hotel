@@ -8,12 +8,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
+
 use App\Models\Empresa;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Fatura;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\FaturaReciboMail;
+
 
 class ReservaController extends Controller
 {
@@ -24,113 +28,108 @@ class ReservaController extends Controller
         return view('reservas.index', compact('reservas', 'quartos'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'cliente_nome' => 'required',
-            'cliente_documento' => 'required',
-            'cliente_email' => 'nullable|email',
-            'cliente_telefone' => 'nullable',
-            'quarto_id' => 'required|exists:quartos,id',
-            'data_entrada' => 'required|date_format:Y-m-d\TH:i',
-            'data_saida' => 'required|date_format:Y-m-d\TH:i|after:data_entrada',
-            'numero_pessoas' => 'required|integer|min:1',
-            'observacoes' => 'nullable|string',
-            'gerar_fatura' => 'sometimes|in:1,0,on',
+   
+public function store(Request $request)
+{
+    $request->validate([
+        'cliente_nome' => 'required',
+        'cliente_documento' => 'required',
+        'cliente_email' => 'nullable|email',
+        'cliente_telefone' => 'nullable',
+        'quarto_id' => 'required|exists:quartos,id',
+        'data_entrada' => 'required|date_format:Y-m-d\TH:i',
+        'data_saida' => 'required|date_format:Y-m-d\TH:i|after:data_entrada',
+        'numero_pessoas' => 'required|integer|min:1',
+        'observacoes' => 'nullable|string',
+    ]);
+
+    try {
+        $quarto = Quarto::findOrFail($request->quarto_id);
+
+        $data_entrada = Carbon::parse($request->data_entrada);
+        $data_saida = Carbon::parse($request->data_saida);
+        $numero_noites = $data_entrada->diffInMinutes($data_saida) / 60;
+        $valor_total = ceil($numero_noites) * $quarto->preco_noite;
+
+        $reserva = new Reserva();
+        $reserva->cliente_nome = $request->cliente_nome;
+        $reserva->cliente_documento = $request->cliente_documento;
+        $reserva->cliente_email = $request->cliente_email;
+        $reserva->cliente_telefone = $request->cliente_telefone;
+        $reserva->quarto_id = $request->quarto_id;
+        $reserva->data_entrada = $data_entrada;
+        $reserva->data_saida = $data_saida;
+        $reserva->numero_noites = $numero_noites;
+        $reserva->valor_total = $valor_total;
+        $reserva->observacoes = $request->observacoes;
+        $reserva->numero_pessoas = $request->numero_pessoas;
+        $reserva->status = 'Reservado';
+        $reserva->user_id = Auth::id();
+        $reserva->save();
+
+        $quarto->update(['status' => 'Reservado']);
+
+        // Após salvar a reserva...
+$empresa = Empresa::firstOrFail();
+     $numeroFatura = Fatura::max('numero') + 1;
+        // Cria Fatura após reserva
+        $fatura = Fatura::create([
+            'reserva_id' => $reserva->id,
+            'tipo_documento' => 'Fatura',
+            'serie' => 'A',
+        'numero' => $numeroFatura,
+            'data_emissao' => now(),
+            'total' => $reserva->valor_total,
+            'valor_entregue' => 0,
+            'troco' => 0,
+            'nome_cliente' => $reserva->cliente_nome,
+           'nif' => '999999999',
+            'telefone' => $reserva->cliente_telefone,
+            'estado_documento' => 'Emitido',
+            'hash' => Str::random(40),
+            'hash_control' => null,
+            'regime_autofaturacao' => false,
+            'regime_iva_caixa' => false,
+            'emitido_terceiros' => false,
+            'metodo_pagamento' => '---',
+            'codigo_cae' => 'HOTEL-001',
+            'servico_id' => null,
         ]);
 
-        try {
-            $quarto = Quarto::findOrFail($request->quarto_id);
+   // Envia e-mail se cliente tiver e-mail
+        if ($reserva->cliente_email) {
+            Mail::to($reserva->cliente_email)->send(new FaturaReciboMail($fatura, $empresa));
+        }
 
-            $data_entrada = Carbon::parse($request->data_entrada);
-            $data_saida = Carbon::parse($request->data_saida);
-            $numero_noites = $data_entrada->diffInMinutes($data_saida) / 60;
-            $valor_total = ceil($numero_noites) * $quarto->preco_noite;
+           return redirect()->back()->with('success', 'Reserva criada com sucesso!')
+           ->with('fatura_id', $fatura->id)
+            ->with('origem_fatura', 'reserva');
 
-            $reserva = new Reserva();
-            $reserva->cliente_nome = $request->cliente_nome;
-            $reserva->cliente_documento = $request->cliente_documento;
-            $reserva->cliente_email = $request->cliente_email;
-            $reserva->cliente_telefone = $request->cliente_telefone;
-            $reserva->quarto_id = $request->quarto_id;
-            $reserva->data_entrada = $data_entrada;
-            $reserva->data_saida = $data_saida;
-            $reserva->numero_noites = $numero_noites;
-            $reserva->valor_total = $valor_total;
-            $reserva->observacoes = $request->observacoes;
-            $reserva->numero_pessoas = $request->numero_pessoas;
-            $reserva->status = 'Reservado';
-            $reserva->user_id = Auth::id();
-            $reserva->save();
+    } catch (\Exception $e) {
+        Log::error('Erro ao criar reserva: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'Erro ao criar reserva: ' . $e->getMessage());
+    }
+}
 
-            $quarto->update(['status' => 'Reservado']);
+public function visualizarFatura($id)
+{
+    $fatura = Fatura::with('reserva')->findOrFail($id);
+    $empresa = Empresa::firstOrFail();
 
-            $gerarFatura = in_array($request->input('gerar_fatura'), ['1', 'on'], true);
-
-            if ($gerarFatura) {
-                $empresa = Empresa::firstOrFail();
-                $pdf = PDF::loadView('reservas.fatura', [
-                    'reserva' => $reserva,
-                    'empresa' => $empresa
-                ]);
-
-                $pdfPath = 'faturas/fatura_reserva_' . $reserva->id . '.pdf';
-                Storage::put('public/' . $pdfPath, $pdf->output());
-
-                Fatura::create([
-                    'tipo_documento' => 'Fatura-Recibo',
-                    'serie' => 'A',
-                    'numero' => $reserva->id,
-                    'data_emissao' => now(),
-                    'total' => $reserva->valor_total,
-                    'valor_entregue' => $reserva->valor_total,
-                    'troco' => 0,
-                    'nome_cliente' => $reserva->cliente_nome,
-                    'nif' => $empresa->numero_registo_fiscal ?? '999999999',
-                    'telefone' => $reserva->cliente_telefone,
-                    'estado_documento' => 'Emitido',
-                    'hash' => sha1($reserva->id . now()),
-                    'hash_control' => null,
-                    'regime_autofaturacao' => false,
-                    'regime_iva_caixa' => false,
-                    'emitido_terceiros' => false,
-                    'metodo_pagamento' => 'Dinheiro',
-                    'codigo_cae' => $empresa->id_empresa ?? '0000',
-                    'mesa_id' => null,
-                    'servico_id' => null,
-                ]);
-            }
-
-      if ($gerarFatura) {
-    return redirect()->route('reservas.index')->with([
-        'success' => 'Reserva cadastrada com sucesso!',
-        'fatura_id' => $reserva->id,
-    ]);
+    $pdf = PDF::loadView('reservas.fatura', compact('fatura', 'empresa'));
+    return $pdf->stream('fatura_reserva_' . $fatura->numero . '.pdf');
 }
 
 
-            return redirect()->back()->with('success', 'Reserva cadastrada com sucesso!');
-        } catch (\Exception $e) {
-            Log::error('Erro ao criar reserva: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Erro ao criar reserva: ' . $e->getMessage());
-        }
-    }
+public function gerarFaturaPdf($id)
+{
+    $fatura = Fatura::findOrFail($id);
+    $empresa = Empresa::first();
 
-    public function fatura($id)
-    {
-        try {
-            $reserva = Reserva::with(['quarto.tipo'])->findOrFail($id);
-            $empresa = Empresa::firstOrFail();
+    $pdf = Pdf::loadView('reservas.fatura', compact('fatura', 'empresa'));
 
-            $pdf = Pdf::loadView('reservas.fatura', compact('reserva', 'empresa'));
-            return $pdf->stream('fatura_reserva_' . $reserva->id . '.pdf');
-        } catch (\Exception $e) {
-            Log::error('Erro ao gerar fatura da reserva: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Erro ao gerar fatura: ' . $e->getMessage());
-        }
-    }
-
-
+    return $pdf->stream('fatura_' . $fatura->numero . '.pdf');
+}
 
     public function cancelar($id)
     {
@@ -198,8 +197,41 @@ class ReservaController extends Controller
                 'observacoes' => $request->observacoes
             ]);
 
-            // Redirecionar com mensagem de sucesso
-            return redirect()->back()->with('success', 'Reserva atualizada com sucesso!');
+            $empresa = Empresa::firstOrFail();
+               $numeroFatura = Fatura::max('numero') + 1;
+
+             // Cria Fatura após reserva
+        $fatura = Fatura::create([
+            'reserva_id' => $reserva->id,
+            'tipo_documento' => 'Fatura',
+            'serie' => 'A',
+            'numero' => $numeroFatura,
+            'data_emissao' => now(),
+            'total' => $reserva->valor_total,
+            'valor_entregue' => 0,
+            'troco' => 0,
+            'nome_cliente' => $reserva->cliente_nome,
+            'nif' => $reserva->cliente_documento,
+            'telefone' => $reserva->cliente_telefone,
+            'estado_documento' => 'Emitido',
+            'hash' => Str::random(40),
+            'hash_control' => null,
+            'regime_autofaturacao' => false,
+            'regime_iva_caixa' => false,
+            'emitido_terceiros' => false,
+            'metodo_pagamento' => '---',
+            'codigo_cae' => 'HOTEL-001',
+            'servico_id' => null,
+        ]);
+        // Enviar e-mail automático
+if ($reserva->cliente_email) {
+    Mail::to($reserva->cliente_email)->send(new FaturaReciboMail($fatura, $empresa));
+}
+
+
+        return redirect()->back()->with(['success' => 'Reserva cadastrada com sucesso!', 'fatura_id' => $fatura->id]);
+
+  
         } catch (\Exception $e) {
             // Retornar erro caso ocorra algum problema
             return back()->withErrors('Erro ao atualizar reserva: ' . $e->getMessage());

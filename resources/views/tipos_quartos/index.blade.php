@@ -213,7 +213,7 @@
         </div>
 
 
-        </div>
+
     </main>
     @include('layouts.customise')
     <!--   Core JS Files   -->

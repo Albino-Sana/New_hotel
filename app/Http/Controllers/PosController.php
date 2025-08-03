@@ -10,6 +10,9 @@ use App\Models\Checkin;
 use App\Models\Consumo;
 use App\Models\ServicoAdicional;
 use App\Models\Hospede;
+use App\Models\Pagamento;
+use App\Models\Empresa;
+use App\Models\PagamentoMetodo;
 
 class PosController extends Controller
 {
@@ -28,7 +31,23 @@ class PosController extends Controller
         $checkin = Checkin::where('status', 'hospedado')->get();
         $hospedesHospedados = Hospede::where('status', 'Hospedado')->with('quarto')->get();
 
+        $pagamentosPendentes = Pagamento::with(['hospede', 'checkin.reserva'])
+            ->where('status_pagamento', 'pendente')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        $pagamentosPagos = Pagamento::with(['hospede', 'checkin.reserva'])
+            ->where('status_pagamento', 'pago')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         $servicosAdicionais = ServicoAdicional::all();
+
+        $pagamentos = Pagamento::latest()
+            ->with(['checkin.reserva', 'hospede'])
+            ->get();
+        $checkins = Checkin::doesntHave('pagamento')->get();
+        $hospedes = Hospede::doesntHave('pagamento')->get();
+        $metodos_pagamento = PagamentoMetodo::all();
 
         return view('POS.pos1', [
             'nomeUsuario' => $user->name,
@@ -37,10 +56,18 @@ class PosController extends Controller
             'reservas' => $reservas,
             'checkin' => $checkin,
             'servicosAdicionais' => $servicosAdicionais, // Corrigido: $servicosAdicional para $servicosAdicionais
-           'quartos' => $quartosTodos, // Agora contém os relacionamentos
+            'quartos' => $quartosTodos, // Agora contém os relacionamentos
             'quartosDisponiveis' => $quartosDisponiveis, // Só os disponíveis para o select
-            'hospedesHospedados' => $hospedesHospedados
+            'hospedesHospedados' => $hospedesHospedados,
+            'pagamentosPendentes' => $pagamentosPendentes,
+            'pagamentos' => $pagamentos,
+            'checkins' => $checkins,
+            'hospedes' => $hospedes,
+            'metodos_pagamento' => $metodos_pagamento,
+            'pagamentosPagos' => $pagamentosPagos,
 
         ]);
     }
+
+
 }

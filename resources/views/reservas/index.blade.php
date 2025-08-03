@@ -99,7 +99,7 @@
                                                     <button class="btn btn-sm btn-icon-only btn-outline-info rounded-circle"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#verModal{{ $reserva->id }}"
-                                                        data-bs-toggle="tooltip"
+                                                         data-bs-placement="top"
                                                         data-bs-placement="top"
                                                         title="Visualizar">
                                                         <i class="fas fa-eye fa-xs"></i>
@@ -159,126 +159,6 @@
                                                 </div>
                                             </td>
                                         </tr>
-
-                                        <!-- Modal de Editar Reserva -->
-                                        <div class="modal fade" id="editarModal{{ $reserva->id }}" tabindex="-1" aria-labelledby="editarModalLabel{{ $reserva->id }}" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                <div class="modal-content">
-                                                    <form action="{{ route('reservas.update', $reserva->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-
-                                                        <div class="modal-header bg-gradient-primary text-white">
-                                                            <h5 class="modal-title text-white">
-                                                                <i class="fas fa-calendar-edit me-2"></i>Editar Reserva
-                                                            </h5>
-                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                                                        </div>
-
-                                                        <div class="modal-body">
-                                                            <!-- Dados do Cliente -->
-                                                            <div class="card mb-3 shadow-sm">
-                                                                <div class="card-header bg-light">
-                                                                    <strong><i class="fas fa-user-tie me-2 text-primary"></i>Dados do Cliente</strong>
-                                                                </div>
-                                                                <div class="card-body row">
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-user me-1 text-secondary"></i>Nome do Cliente</label>
-                                                                        <input type="text" class="form-control" name="cliente_nome" value="{{ $reserva->cliente_nome }}" required>
-                                                                    </div>
-
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-id-card me-1 text-secondary"></i>Documento do Cliente</label>
-                                                                        <select class="form-control" name="cliente_documento">
-                                                                            <option value="bi" {{ $reserva->cliente_documento == 'bi' ? 'selected' : '' }}>BI</option>
-                                                                            <option value="passaporte" {{ $reserva->cliente_documento == 'passaporte' ? 'selected' : '' }}>Passaporte</option>
-                                                                            <option value="carta_conducao" {{ $reserva->cliente_documento == 'carta_conducao' ? 'selected' : '' }}>Carta de Condução</option>
-                                                                        </select>
-                                                                    </div>
-
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-envelope me-1 text-secondary"></i>E-mail do Cliente</label>
-                                                                        <input type="email" class="form-control" name="cliente_email" value="{{ $reserva->cliente_email }}">
-                                                                    </div>
-
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-phone me-1 text-secondary"></i>Telefone do Cliente</label>
-                                                                        <input type="text" class="form-control" name="cliente_telefone" value="{{ $reserva->cliente_telefone }}">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Detalhes da Reserva -->
-                                                            <div class="card mb-3 shadow-sm">
-                                                                <div class="card-header bg-light">
-                                                                    <strong><i class="fas fa-calendar-alt me-2 text-primary"></i>Detalhes da Reserva</strong>
-                                                                </div>
-                                                                <div class="card-body row">
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-bed me-1 text-secondary"></i>Quarto</label>
-                                                                        <select class="form-control" name="quarto_id">
-                                                                            @if ($reserva->quarto)
-                                                                            <option value="{{ $reserva->quarto_id }}" selected>
-                                                                                {{ $reserva->quarto->numero }} - {{ $reserva->quarto->status }}
-                                                                            </option>
-                                                                            @else
-                                                                            <option value="{{ $reserva->quarto_id }}" selected disabled>
-                                                                                Quarto excluído
-                                                                            </option>
-                                                                            @endif
-
-
-                                                                            @foreach($quartos as $quarto)
-                                                                             <option value="{{ $quarto->id }}">Quarto {{ $quarto->numero }} - {{ $quarto->tipo->nome }}</option>
-                                                                            @endforeach
-                                                                        </select>
-                                                                    </div>
-
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-users me-1 text-secondary"></i>Número de Pessoas</label>
-                                                                        <input type="number" class="form-control" name="numero_pessoas" value="{{ $reserva->numero_pessoas }}" min="1" required>
-                                                                    </div>
-
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-sign-in-alt me-1 text-secondary"></i>Data de Entrada</label>
-                                                                        <input type="datetime-local" name="data_entrada" class="form-control"
-                                                                            value="{{ \Carbon\Carbon::parse($reserva->data_entrada)->format('Y-m-d\TH:i') }}" required>
-                                                                    </div>
-
-                                                                    <div class="col-md-6 mb-3">
-                                                                        <label><i class="fas fa-sign-out-alt me-1 text-secondary"></i>Data de Saída</label>
-                                                                        <input type="datetime-local" name="data_saida" class="form-control"
-                                                                            value="{{ \Carbon\Carbon::parse($reserva->data_saida)->format('Y-m-d\TH:i') }}" required>
-                                                                    </div>
-
-                                                                </div>
-
-                                                                <!-- Observações -->
-                                                                <div class="card mb-3 shadow-sm">
-                                                                    <div class="card-header bg-light">
-                                                                        <strong><i class="fas fa-sticky-note me-2 text-primary"></i>Observações</strong>
-                                                                    </div>
-                                                                    <div class="card-body">
-                                                                        <div class="mb-3">
-                                                                            <label><i class="fas fa-comment-dots me-1 text-secondary"></i>Informações Adicionais</label>
-                                                                            <textarea class="form-control" name="observacoes" rows="3">{{ $reserva->observacoes }}</textarea>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                                    <i class="fas fa-times me-1"></i>Fechar
-                                                                </button>
-                                                                <button type="submit" class="btn btn-success">
-                                                                    <i class="fas fa-save me-1"></i>Salvar Alterações
-                                                                </button>
-                                                            </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
 
 
                                         <!-- Modal de Ver Reserva -->
@@ -398,6 +278,128 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- Modal de Editar Reserva -->
+                                        <div class="modal fade" id="editarModal{{ $reserva->id }}" tabindex="-1" aria-labelledby="editarModalLabel{{ $reserva->id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                <div class="modal-content">
+                                                    <form action="{{ route('reservas.update', $reserva->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+
+                                                        <div class="modal-header bg-gradient-primary text-white">
+                                                            <h5 class="modal-title text-white">
+                                                                <i class="fas fa-calendar-edit me-2"></i>Editar Reserva
+                                                            </h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                                        </div>
+
+                                                        <div class="modal-body">
+                                                            <!-- Dados do Cliente -->
+                                                            <div class="card mb-3 shadow-sm">
+                                                                <div class="card-header bg-light">
+                                                                    <strong><i class="fas fa-user-tie me-2 text-primary"></i>Dados do Cliente</strong>
+                                                                </div>
+                                                                <div class="card-body row">
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label><i class="fas fa-user me-1 text-secondary"></i>Nome do Cliente</label>
+                                                                        <input type="text" class="form-control" name="cliente_nome" value="{{ $reserva->cliente_nome }}" required>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label><i class="fas fa-id-card me-1 text-secondary"></i>Documento do Cliente</label>
+                                                                        <select class="form-control" name="cliente_documento">
+                                                                            <option value="bi" {{ $reserva->cliente_documento == 'bi' ? 'selected' : '' }}>BI</option>
+                                                                            <option value="passaporte" {{ $reserva->cliente_documento == 'passaporte' ? 'selected' : '' }}>Passaporte</option>
+                                                                            <option value="carta_conducao" {{ $reserva->cliente_documento == 'carta_conducao' ? 'selected' : '' }}>Carta de Condução</option>
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label><i class="fas fa-envelope me-1 text-secondary"></i>E-mail do Cliente</label>
+                                                                        <input type="email" class="form-control" name="cliente_email" value="{{ $reserva->cliente_email }}">
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label><i class="fas fa-phone me-1 text-secondary"></i>Telefone do Cliente</label>
+                                                                        <input type="text" class="form-control" name="cliente_telefone" value="{{ $reserva->cliente_telefone }}">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Detalhes da Reserva -->
+                                                            <div class="card mb-3 shadow-sm">
+                                                                <div class="card-header bg-light">
+                                                                    <strong><i class="fas fa-calendar-alt me-2 text-primary"></i>Detalhes da Reserva</strong>
+                                                                </div>
+                                                                <div class="card-body row">
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label><i class="fas fa-bed me-1 text-secondary"></i>Quarto</label>
+                                                                        <select class="form-control" name="quarto_id">
+                                                                            @if ($reserva->quarto)
+                                                                            <option value="{{ $reserva->quarto_id }}" selected>
+                                                                                {{ $reserva->quarto->numero }} - {{ $reserva->quarto->status }}
+                                                                            </option>
+                                                                            @else
+                                                                            <option value="{{ $reserva->quarto_id }}" selected disabled>
+                                                                                Quarto excluído
+                                                                            </option>
+                                                                            @endif
+
+
+                                                                            @foreach($quartos as $quarto)
+                                                                            <option value="{{ $quarto->id }}">Quarto {{ $quarto->numero }} - {{ $quarto->tipo->nome }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label><i class="fas fa-users me-1 text-secondary"></i>Número de Pessoas</label>
+                                                                        <input type="number" class="form-control" name="numero_pessoas" value="{{ $reserva->numero_pessoas }}" min="1" required>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label><i class="fas fa-sign-in-alt me-1 text-secondary"></i>Data de Entrada</label>
+                                                                        <input type="datetime-local" name="data_entrada" class="form-control"
+                                                                            value="{{ \Carbon\Carbon::parse($reserva->data_entrada)->format('Y-m-d\TH:i') }}" required>
+                                                                    </div>
+
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label><i class="fas fa-sign-out-alt me-1 text-secondary"></i>Data de Saída</label>
+                                                                        <input type="datetime-local" name="data_saida" class="form-control"
+                                                                            value="{{ \Carbon\Carbon::parse($reserva->data_saida)->format('Y-m-d\TH:i') }}" required>
+                                                                    </div>
+
+                                                                </div>
+
+                                                                <!-- Observações -->
+                                                                <div class="card mb-3 shadow-sm">
+                                                                    <div class="card-header bg-light">
+                                                                        <strong><i class="fas fa-sticky-note me-2 text-primary"></i>Observações</strong>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <div class="mb-3">
+                                                                            <label><i class="fas fa-comment-dots me-1 text-secondary"></i>Informações Adicionais</label>
+                                                                            <textarea class="form-control" name="observacoes" rows="3">{{ $reserva->observacoes }}</textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                                    <i class="fas fa-times me-1"></i>Fechar
+                                                                </button>
+                                                                <button type="submit" class="btn btn-success">
+                                                                    <i class="fas fa-save me-1"></i>Salvar Alterações
+                                                                </button>
+                                                            </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -530,15 +532,16 @@
 
 
     </script>
- @if (session('fatura_id'))
+    @if (session('fatura_id'))
     <script>
-        window.addEventListener('DOMContentLoaded', function () {
-            setTimeout(function () {
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
                 window.open("{{ route('reservas.fatura', session('fatura_id')) }}", '_blank');
             }, 1000);
         });
     </script>
-@endif
+    @endif
+
 
     @include('layouts.customise')
 
