@@ -7,11 +7,32 @@ use Illuminate\Http\Request;
 
 class TipoQuartoController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
-        $tipos = TipoQuarto::orderBy('nome', 'asc')->get();
+        $query = TipoQuarto::query();
+
+        if ($request->filled('nome')) {
+            $query->where('nome', 'like', '%' . $request->nome . '%');
+        }
+
+        if ($request->filled('capacidade')) {
+            $query->where('capacidade', $request->capacidade);
+        }
+
+        if ($request->filled('preco_min')) {
+            $query->where('preco', '>=', $request->preco_min);
+        }
+
+        if ($request->filled('preco_max')) {
+            $query->where('preco', '<=', $request->preco_max);
+        }
+
+        $tipos = $query->orderBy('nome', 'asc')->get();
+
         return view('tipos_quartos.index', compact('tipos'));
     }
+
 
     public function create()
     {
@@ -67,7 +88,7 @@ class TipoQuartoController extends Controller
         $request->validate([
             'nome' => 'required|max:100',
             'descricao' => 'nullable|string',
-             'tipo_cobranca' => 'required|in:Por Noite,Por Hora',
+            'tipo_cobranca' => 'required|in:Por Noite,Por Hora',
             'preco' => 'required|numeric|min:0',
         ]);
 

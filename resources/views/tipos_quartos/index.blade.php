@@ -24,6 +24,8 @@
         @endphp
         @include('layouts.navbar', ['titulo' => $titulo])
 
+        <!-- Card de Filtros -->
+
 
         <div class="container-fluid py-4">
             <div class="row">
@@ -33,6 +35,41 @@
                             <h6 class="text-capitalize">Lista de Tipos de Quartos</h6>
                             <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoTipo">Adicionar Tipo</button>
                         </div>
+
+                        <!-- Filtro de Tipos de Quarto -->
+                        <div class="col-12 mb-4">
+
+                                <div class="card-body">
+                                    <h5 class="card-title">Filtrar Tipos de Quarto</h5>
+                                    <form method="GET" action="{{ route('tipos-quartos.index') }}">
+                                        <div class="row g-3 align-items-end">
+                                            <div class="col-md-3">
+                                                <label for="nome" class="form-label">Nome</label>
+                                                <input type="text" name="nome" id="nome" class="form-control" value="{{ request('nome') }}" placeholder="Suite, Luxo...">
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label for="preco_min" class="form-label">Preço Mínimo</label>
+                                                <input type="number" name="preco_min" id="preco_min" class="form-control" value="{{ request('preco_min') }}" step="0.01">
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label for="preco_max" class="form-label">Preço Máximo</label>
+                                                <input type="number" name="preco_max" id="preco_max" class="form-control" value="{{ request('preco_max') }}" step="0.01">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="form-label">&nbsp;</label>
+                                                <div style="position: relative; top: 15px;">
+                                                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                        </div>
+
+
 
                         <div class="card-body px-0 pb-2">
                             <!-- Tabela -->
@@ -89,7 +126,7 @@
 
                                         <!-- Modal Editar Tipo de Quarto -->
                                         <div class="modal fade" id="editarTipoModal{{ $tipo->id }}" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
                                                 <div class="modal-content">
                                                     <form action="{{ route('tipos-quartos.update', $tipo->id) }}" method="POST">
                                                         @csrf
@@ -157,7 +194,7 @@
 
             <!-- Modal Criar Tipo de Quarto -->
             <div class="modal fade" id="modalNovoTipo" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <form action="{{ route('tipos-quartos.store') }}" method="POST">
                             @csrf

@@ -90,11 +90,8 @@
 
                                                         <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                                                             <!-- Informações do Cargo -->
-                                                            <div class="card mb-3 shadow-sm">
-                                                                <div class="card-header bg-light">
-                                                                    <strong><i class="fas fa-info-circle me-2 text-primary"></i>Informações do Cargo</strong>
-                                                                </div>
-                                                                <div class="card-body">
+                                                    
+                                                            
                                                                     <div class="mb-3">
                                                                         <label><i class="fas fa-signature me-1 text-secondary"></i>Nome do Cargo</label>
                                                                         <input type="text" name="nome" value="{{ $cargo->nome }}" class="form-control" required>
@@ -103,8 +100,7 @@
                                                                     <div class="mb-3">
                                                                         <label><i class="fas fa-align-left me-1 text-secondary"></i>Descrição</label>
                                                                         <textarea name="descricao" class="form-control" rows="3" placeholder="Descreva o cargo...">{{ $cargo->descricao }}</textarea>
-                                                                    </div>
-                                                                </div>
+                                                         
                                                             </div>
                                                         </div>
 

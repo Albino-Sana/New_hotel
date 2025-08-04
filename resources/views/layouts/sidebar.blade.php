@@ -40,15 +40,6 @@ $tipoUser = Auth::user()->tipo ?? null;
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('cargos.*') ? 'active' : '' }}" href="{{ route('cargos.index') }}">
-                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-badge text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Cargos</span>
-                </a>
-            </li>
-
             <x-dropdown align="right" width="48">
                 <x-slot name="trigger">
                     <a class="nav-link d-flex align-items-center {{ request()->routeIs('tipos-quartos.*') || request()->routeIs('quartos.*') ? 'active' : '' }}" href="#" role="button">
@@ -56,15 +47,15 @@ $tipoUser = Auth::user()->tipo ?? null;
                             <i class="ni ni-building text-dark text-sm opacity-10"></i>
                         </div>
                         <span class="nav-link-text ms-1">Quartos</span>
-                        <i class="fas fa-caret-down ms-2"></i>
+                        <i class="fas fa-caret-down ms-2 transition-transform duration-200"></i>
                     </a>
                 </x-slot>
                 <x-slot name="content">
-                    <a href="{{ route('tipos-quartos.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
-                        Tipos de Quartos
+                    <a href="{{ route('tipos-quartos.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('tipos-quartos.*') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-layer-group mr-2 ml-1"></i> Tipos de Quartos
                     </a>
-                    <a href="{{ route('quartos.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
-                        Gerir Quartos
+                    <a href="{{ route('quartos.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('quartos.*') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-door-closed mr-2 ml-1"></i> Gerir Quartos
                     </a>
                 </x-slot>
             </x-dropdown>
@@ -84,7 +75,7 @@ $tipoUser = Auth::user()->tipo ?? null;
                     <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="fas fa-door-open text-dark text-sm opacity-10"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Check-in e check-out</span>
+                    <span class="nav-link-text ms-1">Check-In/Check-Out</span>
                 </a>
             </li>
 
@@ -115,22 +106,22 @@ $tipoUser = Auth::user()->tipo ?? null;
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fas fa-chart-line text-dark text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Relatório</span>
-                        <i class="fas fa-caret-down ms-2"></i>
+                        <span class="nav-link-text ms-1">Relatórios</span>
+                        <i class="fas fa-caret-down ms-2 transition-transform duration-200"></i>
                     </a>
                 </x-slot>
                 <x-slot name="content">
-                    <a href="{{ route('relatorios.ocupacao') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
-                        Ocupação de Quartos
+                    <a href="{{ route('relatorios.ocupacao') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('relatorios.ocupacao') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-bed mr-2 ml-1"></i> Ocupação de Quartos
                     </a>
-                    <a href="{{ route('relatorios.reservas-cancelamentos') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
-                        Cancelamento de Reservas
+                    <a href="{{ route('relatorios.reservas-cancelamentos') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('relatorios.reservas-cancelamentos') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-calendar-times mr-2 ml-1"></i> Cancelamento de Reservas
                     </a>
-                    <a href="{{ route('relatorios.faturamento') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
-                        Faturamento
+                    <a href="{{ route('relatorios.faturamento') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('relatorios.faturamento') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-money-bill-wave mr-2 ml-1"></i> Faturamento
                     </a>
-                    <a href="{{ route('relatorios.servicos-extras') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
-                        Serviços extras vendidos
+                    <a href="{{ route('relatorios.servicos-extras') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('relatorios.servicos-extras') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-glass-cheers mr-2 ml-1"></i> Serviços extras vendidos
                     </a>
                 </x-slot>
             </x-dropdown>
@@ -148,33 +139,60 @@ $tipoUser = Auth::user()->tipo ?? null;
 
             <x-dropdown align="right" width="48">
                 <x-slot name="trigger">
-                    <a class="nav-link d-flex align-items-center {{ request()->routeIs('documentos.*') ? 'active' : '' }}" href="#" role="button">
+                    <a class="nav-link d-flex align-items-center {{ request()->routeIs('documentos.*') || request()->routeIs('faturas.*') || request()->routeIs('faturasRecibo.*') ? 'active' : '' }}" href="#" role="button">
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fas fa-file-alt text-dark text-sm opacity-10"></i>
                         </div>
                         <span class="nav-link-text ms-1">Documentos</span>
-                        <i class="fas fa-caret-down ms-2"></i>
+                        <i class="fas fa-caret-down ms-2 transition-transform duration-200"></i>
                     </a>
                 </x-slot>
 
                 <x-slot name="content">
-                    <a href="{{ route('faturas.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
-                        Fatura
+                    <a href="{{ route('faturas.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('faturas.*') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-file-invoice mr-2 ml-1"></i> Fatura
                     </a>
-                    <a href="{{ route('faturasRecibo.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100">
-                        Fatura Recibo
+                    <a  href="{{ route('faturasRecibo.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('faturasRecibo.*') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-receipt mr-2 ml-1"></i> Fatura Recibo
                     </a>
                 </x-slot>
             </x-dropdown>
 
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('saft.form') ? 'active' : '' }}" href="{{ route('saft.form') }}">
-                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="fas fa-file-code text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Gerar SAFT</span>
-                </a>
-            </li>
+            <x-dropdown align="right" width="48">
+                <x-slot name="trigger">
+                    <a class="nav-link d-flex align-items-center {{ request()->routeIs('agt.*') ? 'active' : '' }}" href="#" role="button">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-file-contract text-dark text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">AGTributária</span>
+                        <i class="fas fa-caret-down ms-2 transition-transform duration-200"></i>
+                    </a>
+                </x-slot>
+
+                <x-slot name="content">
+                    <a href="{{ route('saft.form') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('saft.*') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-file-export mr-2 ml-1"></i> Gerar SAFT
+                    </a>
+                </x-slot>
+            </x-dropdown>
+
+            <x-dropdown align="right" width="48">
+                <x-slot name="trigger">
+                    <a class="nav-link d-flex align-items-center {{ request()->routeIs('cargos.*') ? 'active' : '' }}" href="#" role="button">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-cog text-dark text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Configurações</span>
+                        <i class="fas fa-caret-down ms-2 transition-transform duration-200"></i>
+                    </a>
+                </x-slot>
+
+                <x-slot name="content" >
+                    <a href="{{ route('cargos.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('cargos.*') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-user-tie mr-2 ml-1"></i> Cargos
+                    </a>
+                </x-slot>
+            </x-dropdown>
             @endif
         </ul>
     </div>

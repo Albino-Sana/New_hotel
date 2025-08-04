@@ -75,7 +75,7 @@
                                                                 @endfor
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-3 d-flex align-items-end">
+                                                    <div class="col-md-3 d-flex align-items-end" style="position: relative; top: 15px;">
                                                         <button type="submit" class="btn btn-primary w-100">Filtrar</button>
                                                     </div>
                                                 </div>

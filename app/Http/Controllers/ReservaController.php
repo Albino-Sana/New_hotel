@@ -135,7 +135,7 @@ public function gerarFaturaPdf($id)
     {
         try {
             $reserva = Reserva::findOrFail($id);
-            $reserva->status = 'cancelada';
+            $reserva->status = 'cancelado';
             $reserva->save();
 
             return back()->with('success', 'Reserva cancelada com sucesso!');

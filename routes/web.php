@@ -54,7 +54,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('can:admin-only')->group(function () {
         Route::get('/saft', [SAFTController::class, 'form'])->name('saft.form');
         Route::post('/saft', [SAFTController::class, 'gerar'])->name('saft.gerar');
-Route::get('/saft/download/{filename}', [SAFTController::class, 'download'])->name('download.saft');
+        Route::get('/saft/download/{filename}', [SAFTController::class, 'download'])->name('download.saft');
         Route::get('/hotel', [EmpresaController::class, 'index'])->name('hotel.index');
         Route::put('/hotel', [EmpresaController::class, 'store'])->name('hotel.store');
         Route::post('/pagamentos', [PagamentoController::class, 'store'])->name('pagamentos.store');
@@ -86,16 +86,16 @@ Route::get('/saft/download/{filename}', [SAFTController::class, 'download'])->na
         Route::get('/sys/hotelaria/cargos/753/criar-cargo', [CargoController::class, 'create'])->name('cargos.create');
         Route::post('/sys/hotelaria/cargos/852/salvar-cargo', [CargoController::class, 'store'])->name('cargos.store');
         Route::get('/sys/hotelaria/cargos/951/editar-cargo', [CargoController::class, 'edit'])->name('cargos.edit');
-        Route::put('/sys/hotelaria/cargos/atualizar-cargo/{id}', [CargoController::class, 'update'])->name('cargos.update');
-        Route::delete('/sys/hotelaria/cargos/remover-cargo/{id}', [CargoController::class, 'destroy'])->name('cargos.destroy');
+        Route::put('/sys/hotelaria/cargos/atualizar-cargo/{cargo}', [CargoController::class, 'update'])->name('cargos.update');
+        Route::delete('/sys/hotelaria/cargos/remover-cargo/{cargo}', [CargoController::class, 'destroy'])->name('cargos.destroy');
 
         // Tipos de Quartos
         Route::get('/sys/hotelaria/tipos-quartos/258/listar-tipos-quartos', [TipoQuartoController::class, 'index'])->name('tipos-quartos.index');
         Route::get('/sys/hotelaria/tipos-quartos/369/criar-tipo-quarto', [TipoQuartoController::class, 'create'])->name('tipos-quartos.create');
         Route::post('/sys/hotelaria/tipos-quartos/147/salvar-tipo-quarto', [TipoQuartoController::class, 'store'])->name('tipos-quartos.store');
         Route::get('/sys/hotelaria/tipos-quartos/852/editar-tipo-quarto', [TipoQuartoController::class, 'edit'])->name('tipos-quartos.edit');
-        Route::put('/sys/hotelaria/tipos-quartos/atualizar-tipo-quarto/{id}', [TipoQuartoController::class, 'update'])->name('tipos-quartos.update');
-        Route::delete('/sys/hotelaria/tipos-quartos/remover-tipo-quarto/{id}', [TipoQuartoController::class, 'destroy'])->name('tipos-quartos.destroy');
+        Route::put('/sys/hotelaria/tipos-quartos/atualizar-tipo-quarto/{tipos_quarto}', [TipoQuartoController::class, 'update'])->name('tipos-quartos.update');
+        Route::delete('/sys/hotelaria/tipos-quartos/remover-tipo-quarto/{tipos_quarto}', [TipoQuartoController::class, 'destroy'])->name('tipos-quartos.destroy');
 
         // Quartos
         Route::get('/sys/hotelaria/quartos/456/listar-quartos', [QuartoController::class, 'index'])->name('quartos.index');
@@ -195,7 +195,8 @@ Route::middleware('can:gerenciar-reservas')->group(function () {
     Route::post('/sys/hotelaria/reservas/checkin/{id}', [ReservaController::class, 'checkin'])->name('reservas.checkin');
     Route::get('/reservas/{id}/fatura', [ReservaController::class, 'fatura'])->name('reservas.fatura');
 
-    Route::post('/sys/hotelaria/reservas/147/cancelar', [ReservaController::class, 'cancelar'])->name('reservas.cancelar');
+Route::post('/sys/hotelaria/reservas/{id}/cancelar', [ReservaController::class, 'cancelar'])->name('reservas.cancelar');
+
     // Checkins
     Route::get('/sys/hotelaria/checkins/369/listar-checkins', [CheckinController::class, 'index'])->name('checkins.index');
     Route::get('/sys/hotelaria/checkins/741/criar-checkin', [CheckinController::class, 'create'])->name('checkins.create');
@@ -321,7 +322,8 @@ Route::middleware('can:recepcionista-only')->group(function () {
     Route::get('/sys/hotelaria/reservas/741/editar-reserva', [ReservaController::class, 'edit'])->name('reservas.edit');
     Route::put('/sys/hotelaria/reservas/atualizar-reserva/{reserva}', [ReservaController::class, 'update'])->name('reservas.update');
     Route::delete('/sys/hotelaria/reservas/remover-reserva/{id}', [ReservaController::class, 'destroy'])->name('reservas.destroy');
-    Route::post('/sys/hotelaria/reservas/147/cancelar', [ReservaController::class, 'cancelar'])->name('reservas.cancelar');
+Route::post('/sys/hotelaria/reservas/{id}/cancelar', [ReservaController::class, 'cancelar'])->name('reservas.cancelar');
+
     Route::post('/sys/hotelaria/reservas/checkin/{id}', [ReservaController::class, 'checkin'])->name('reservas.checkin');
 
     // Checkins

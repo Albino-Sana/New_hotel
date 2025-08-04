@@ -99,7 +99,7 @@
                                                     <button class="btn btn-sm btn-icon-only btn-outline-info rounded-circle"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#verModal{{ $reserva->id }}"
-                                                         data-bs-placement="top"
+                                                        data-bs-placement="top"
                                                         data-bs-placement="top"
                                                         title="Visualizar">
                                                         <i class="fas fa-eye fa-xs"></i>
@@ -116,9 +116,10 @@
                                                         <i class="fas fa-edit fa-xs"></i>
                                                     </button>
 
+                                                    @if ($reserva->status !== 'cancelado')
                                                     <!-- Botão Cancelar -->
                                                     <form action="{{ route('reservas.cancelar', $reserva) }}" method="POST" class="d-inline">
-                                                        @csrf @method('DELETE')
+                                                        @csrf
                                                         <button type="submit"
                                                             class="btn btn-sm btn-icon-only btn-outline-danger rounded-circle btn-delete"
                                                             data-bs-toggle="tooltip"
@@ -127,6 +128,8 @@
                                                             <i class="fas fa-times fa-xs"></i>
                                                         </button>
                                                     </form>
+                                                    @endif
+
 
                                                     <!-- Botão Eliminar (apenas para admin) -->
 

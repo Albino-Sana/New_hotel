@@ -25,7 +25,7 @@
                         <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
                             <div class="card card-plain">
                                 <div class="card-header pb-0 text-start">
-                                    <h4 class="font-weight-bolder">DAT Hotelaria - Login</h4>
+                                    <h4 class="font-weight-bolder">SYS Hotelaria - Login</h4>
                                     <p class="mb-0">Digite seu e-mail e senha para iniciar sessão</p>
                                 </div>
                                 <div class="card-body">
@@ -63,7 +63,7 @@
                                 style="background-image: url('{{ asset('assets/img/login.jpg') }}'); background-size: cover;">
                                 <span class="mask bg-gradient-primary opacity-6"></span>
                                 <h4 class="mt-5 text-white font-weight-bolder position-relative">
-                                    "DAT-SYS"
+                                    "SYS-Hotelaria"
                                 </h4>
                                 <p class="text-white position-relative">
                                     Gestão hoteleira com excelência – porque cada detalhe conta.

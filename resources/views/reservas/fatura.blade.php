@@ -173,7 +173,7 @@
             </div>
             <div class="invoice-info">
                 <div class="invoice-title">FATURA-RECIBO</div>
-                <div class="invoice-number">Numero #{{ $fatura->numero }}</div>
+                <div class="invoice-number">Numero {{ $fatura->numero }}</div>
                 <div><strong>Data de Emissão:</strong> {{ \Carbon\Carbon::now()->format('d-m-Y') }}</div>
             </div>
         </div>
@@ -188,8 +188,13 @@
 
         <div class="client-info">
             <div class="info-title">Cliente</div>
-            <div><strong>Nome:</strong> {{ $reserva->cliente_nome ?? 'N/D' }}</div>
-            <div><strong>Documento:</strong> {{ $reserva->cliente_documento ?? 'N/D' }}</div>
+            @if(optional($fatura->reserva)->cliente_nome)
+            <div><strong>Nome:</strong> {{ $fatura->reserva->cliente_nome }}</div>
+            @endif
+            @if(optional($fatura->reserva)->cliente_documento)
+            <div><strong>Documento:</strong> {{ $fatura->reserva->cliente_documento }}</div>
+            @endif
+
             @if(optional($fatura->reserva)->cliente_email)
             <div><strong>Email:</strong> {{ $fatura->reserva->cliente_email }}</div>
             @endif

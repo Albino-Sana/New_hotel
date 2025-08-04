@@ -7,7 +7,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <title>
-    DAT Hotelaria - Dashboard SYS
+  SYS Hotelaria - Dashboard SYS
   </title>
 
   @include('components.css')
@@ -97,7 +97,7 @@
               <div class="row">
                 <div class="col-8">
                   <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">H. Hospedados</p>
+                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Hospedes</p>
                     <h5 class="font-weight-bolder">{{  $hospedesHospedadosTotal  }}</h5>
                   </div>
                 </div>
@@ -196,7 +196,7 @@
     <div class="card shadow-sm">
       <div class="card-header pb-0 p-3">
         <h6 class="mb-0">
-          <i class="fas fa-user-friends me-2 text-primary"></i>Hóspedes hospedados
+          <i class="fas fa-user-friends me-2 text-primary"></i>Hóspedes
           <span class="badge bg-gradient-primary ms-2">{{ $hospedesHospedados->count() }}</span>
         </h6>
       </div>
