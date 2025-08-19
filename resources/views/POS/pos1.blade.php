@@ -136,7 +136,7 @@
                     </li>
                     @if($tipo === 'Recepcionista' || $tipo === 'Gerente de Caixa' || $tipo === 'Administrador')
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('pos2')}}"><i class="fas fa-utensils me-1"></i> Consumos</a>
+                        <a class="nav-link" href="{{ route('mapas.reservas')}}"><i class="fas fa-utensils me-1"></i> Mapa de reserva</a>
                     </li>
                     @endif
                 </ul>

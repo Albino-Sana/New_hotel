@@ -29,6 +29,11 @@ class Reserva extends Model
     ];
 
     protected $dates = ['data_entrada', 'data_saida', 'created_at', 'deleted_at'];
+    protected $casts = [
+        'data_inicio' => 'date',
+        'data_fim' => 'date',
+    ];
+
     public function hospede()
     {
         return $this->belongsTo(Hospede::class, 'hospede_id');
@@ -39,11 +44,11 @@ class Reserva extends Model
         return $this->hasOne(Checkin::class);
     }
 
-    
+
 
     public function quarto()
     {
-        return $this->belongsTo(Quarto::class);
+        return $this->belongsTo(Quarto::class, 'quarto_id');
     }
 
     public function pagamento()
@@ -52,9 +57,9 @@ class Reserva extends Model
     }
 
     public function servicosAdicionais()
-{
-    return $this->belongsToMany(ServicoAdicional::class, 'reserva_servico_adicional', 'reserva_id', 'servico_adicional_id');
-}
+    {
+        return $this->belongsToMany(ServicoAdicional::class, 'reserva_servico_adicional', 'reserva_id', 'servico_adicional_id');
+    }
 
     public function user()
     {

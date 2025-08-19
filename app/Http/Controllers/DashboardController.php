@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Barryvdh\DomPDF\Facade\Pdf; // Se usar DomPDF
+use App\Models\Empresa; // Certifique-se de que o modelo Empresa está importado
 
 class DashboardController extends Controller
 {
@@ -80,8 +81,10 @@ public function relatorioPDF(Request $request)
     $periodo = $request->query('periodo', '7dias');
     // Lógica para buscar dados com base no período
     $dados = $this->obterDadosRelatorio($periodo); // Implemente esta função
+       $empresa = Empresa::firstOrFail(); // Busca o primeiro registro da tabela empresas
 
-    $pdf = Pdf::loadView('relatorios.dashboard', compact('dados', 'periodo'));
+
+    $pdf = Pdf::loadView('relatorios.dashboard', compact('dados','empresa', 'periodo'));
     return $pdf->download('relatorio_' . $periodo . '.pdf');
 }
 
@@ -121,7 +124,7 @@ private function obterDadosRelatorio($periodo)
                 $count = $reservasDia->count();
                 $data[] = $count;
                 $totalReservas += $count;
-                $valorTotal += $reservasDia->sum('valor');
+                $valorTotal += $reservasDia->sum('valor_total');
             }
         } elseif ($periodo === '1mes') {
             $intervalo = \Carbon\CarbonPeriod::create($dataInicio, $dataFim);
@@ -133,7 +136,7 @@ private function obterDadosRelatorio($periodo)
                 $count = $reservasDia->count();
                 $data[] = $count;
                 $totalReservas += $count;
-                $valorTotal += $reservasDia->sum('valor');
+                $valorTotal += $reservasDia->sum('valor_total');
             }
         } elseif ($periodo === '1ano') {
             $intervalo = \Carbon\CarbonPeriod::create($dataInicio, $dataFim, '1 month');
@@ -145,7 +148,7 @@ private function obterDadosRelatorio($periodo)
                 $count = $reservasMes->count();
                 $data[] = $count;
                 $totalReservas += $count;
-                $valorTotal += $reservasMes->sum('valor');
+                $valorTotal += $reservasMes->sum('valor_total');
             }
         }
 

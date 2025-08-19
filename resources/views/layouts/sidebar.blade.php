@@ -5,8 +5,7 @@ $tipoUser = Auth::user()->tipo ?? null;
     style="background-image: url('{{ asset('assets/img/pos.JPG') }}');
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
-    ">
+    background-repeat: no-repeat;">
 </div>
 <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4" id="sidenav-main">
     <div class="sidenav-header py-3">
@@ -31,7 +30,7 @@ $tipoUser = Auth::user()->tipo ?? null;
             </li>
 
             @if ($tipoUser === 'Administrador')
-            <li class="nav-item" style="display: none;">
+            <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('funcionarios.*') ? 'active' : '' }}" href="{{ route('funcionarios.index') }}">
                     <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
@@ -61,14 +60,25 @@ $tipoUser = Auth::user()->tipo ?? null;
             </x-dropdown>
             @endif
 
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('reservas.*') ? 'active' : '' }}" href="{{ route('reservas.index') }}">
-                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-calendar-grid-58 text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Reservas</span>
-                </a>
-            </li>
+            <x-dropdown align="right" width="48">
+                <x-slot name="trigger">
+                    <a class="nav-link d-flex align-items-center {{ request()->routeIs('reservas.*') || request()->routeIs('mapas.reservas') ? 'active' : '' }}" href="#" role="button">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-calendar-grid-58 text-dark text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Reservas</span>
+                        <i class="fas fa-caret-down ms-2 transition-transform duration-200"></i>
+                    </a>
+                </x-slot>
+                <x-slot name="content">
+                    <a href="{{ route('reservas.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('reservas.*') ? 'bg-gray-100' : '' }}">
+                        <i class="fas fa-layer-group mr-2 ml-1"></i> Lista de Reservas
+                    </a>
+                    <a href="{{ route('mapas.reservas') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('mapas.reservas') ? 'bg-gray-100' : '' }}">
+                        <i class="ni ni-calendar-grid-58 mr-2 ml-1"></i> Mapa
+                    </a>
+                </x-slot>
+            </x-dropdown>
 
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('checkins.*') ? 'active' : '' }}" href="{{ route('checkins.index') }}">
@@ -147,20 +157,21 @@ $tipoUser = Auth::user()->tipo ?? null;
                         <i class="fas fa-caret-down ms-2 transition-transform duration-200"></i>
                     </a>
                 </x-slot>
-
                 <x-slot name="content">
                     <a href="{{ route('faturas.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('faturas.*') ? 'bg-gray-100' : '' }}">
                         <i class="fas fa-file-invoice mr-2 ml-1"></i> Fatura
                     </a>
-                    <a  href="{{ route('faturasRecibo.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('faturasRecibo.*') ? 'bg-gray-100' : '' }}">
+                    <a href="{{ route('faturasRecibo.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('faturasRecibo.*') ? 'bg-gray-100' : '' }}">
                         <i class="fas fa-receipt mr-2 ml-1"></i> Fatura Recibo
                     </a>
                 </x-slot>
             </x-dropdown>
+            @endif
 
+            @if ($tipoUser === 'Administrador')
             <x-dropdown align="right" width="48">
                 <x-slot name="trigger">
-                    <a class="nav-link d-flex align-items-center {{ request()->routeIs('agt.*') ? 'active' : '' }}" href="#" role="button">
+                    <a class="nav-link d-flex align-items-center {{ request()->routeIs('saft.*') ? 'active' : '' }}" href="#" role="button">
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fas fa-file-contract text-dark text-sm opacity-10"></i>
                         </div>
@@ -168,7 +179,6 @@ $tipoUser = Auth::user()->tipo ?? null;
                         <i class="fas fa-caret-down ms-2 transition-transform duration-200"></i>
                     </a>
                 </x-slot>
-
                 <x-slot name="content">
                     <a href="{{ route('saft.form') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('saft.*') ? 'bg-gray-100' : '' }}">
                         <i class="fas fa-file-export mr-2 ml-1"></i> Gerar SAFT
@@ -186,8 +196,7 @@ $tipoUser = Auth::user()->tipo ?? null;
                         <i class="fas fa-caret-down ms-2 transition-transform duration-200"></i>
                     </a>
                 </x-slot>
-
-                <x-slot name="content" >
+                <x-slot name="content">
                     <a href="{{ route('cargos.index') }}" class="dropdown-item d-block px-4 py-2 text-sm text-dark hover:bg-gray-100 {{ request()->routeIs('cargos.*') ? 'bg-gray-100' : '' }}">
                         <i class="fas fa-user-tie mr-2 ml-1"></i> Cargos
                     </a>

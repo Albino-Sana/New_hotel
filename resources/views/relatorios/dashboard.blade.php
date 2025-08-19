@@ -115,14 +115,15 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
+            <div class="header">
+
             <div class="logo">
-                <h1>HOTEL </h1>
+                <h1>{{ $empresa->nome_empresa ?? 'HOTEL POS' }}</h1>
                 <p>Sistema de Gestão Hoteleira</p>
             </div>
             <div class="report-info">
                 <div class="report-title">{{ $dados['titulo'] }}</div>
-                <div class="report-date"><strong>Data de Emissão:</strong> 24-05-2025</div>
+                <div class="report-date"><strong>Data de Emissão:</strong> {{ now()->format('d-m-Y H:i') }}</div>
             </div>
         </div>
 

@@ -35,7 +35,10 @@ class Quarto extends Model
     {
         return $this->hasMany(Reserva::class);
     }
-
+public function reserva()
+{
+    return $this->hasOne(Reserva::class, 'quarto_id');
+}
 
 
 public function hospede()

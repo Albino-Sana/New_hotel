@@ -26,6 +26,8 @@ use App\Models\Fatura;
 use App\Models\Reserva;
 use App\Models\Empresa;
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\MapaReservasController;
+
 
 use App\Models\Pagamento;
 
@@ -122,9 +124,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/sys/hotelaria/relatorios/faturamento', [RelatorioController::class, 'faturamento'])->name('relatorios.faturamento');
         Route::get('/sys/hotelaria/relatorios/dados-faturamento', [RelatorioController::class, 'dadosFaturamento'])->name('relatorios.dados-faturamento');
 
-        Route::get('/sys/hotelaria/pos/123/pos', function () {
-            return view('POS.pos2');
-        })->name('pos2');
+
+        Route::get('/mapas-reservas', [MapaReservasController::class, 'index'])->name('mapas.reservas');
+
+
+
         Route::get('/sys/hotelaria/config/456/configuracoes', [HotelConfigController::class, 'index'])->name('hotel.config');
     });
 
@@ -175,9 +179,8 @@ Route::middleware('can:gerenciar-reservas')->group(function () {
     Route::post('/sys/hotelaria/corrente-servicos/123/store', [CorrenteServicoController::class, 'store'])->name('corrente-servicos.store');
     Route::get('/sys/hotelaria/posto-controle/456/index', [PosController::class, 'index'])->name('PostoControle.index');
 
-    Route::get('/sys/hotelaria/pos/789/pos', function () {
-        return view('POS.pos2');
-    })->name('pos2');
+
+
 
     Route::get('/empresa', [EmpresaController::class, 'index'])->name('empresa.index');
     Route::put('/empresa', [EmpresaController::class, 'store'])->name('empresa.store');
@@ -195,7 +198,7 @@ Route::middleware('can:gerenciar-reservas')->group(function () {
     Route::post('/sys/hotelaria/reservas/checkin/{id}', [ReservaController::class, 'checkin'])->name('reservas.checkin');
     Route::get('/reservas/{id}/fatura', [ReservaController::class, 'fatura'])->name('reservas.fatura');
 
-Route::post('/sys/hotelaria/reservas/{id}/cancelar', [ReservaController::class, 'cancelar'])->name('reservas.cancelar');
+    Route::post('/sys/hotelaria/reservas/{id}/cancelar', [ReservaController::class, 'cancelar'])->name('reservas.cancelar');
 
     // Checkins
     Route::get('/sys/hotelaria/checkins/369/listar-checkins', [CheckinController::class, 'index'])->name('checkins.index');
@@ -322,7 +325,7 @@ Route::middleware('can:recepcionista-only')->group(function () {
     Route::get('/sys/hotelaria/reservas/741/editar-reserva', [ReservaController::class, 'edit'])->name('reservas.edit');
     Route::put('/sys/hotelaria/reservas/atualizar-reserva/{reserva}', [ReservaController::class, 'update'])->name('reservas.update');
     Route::delete('/sys/hotelaria/reservas/remover-reserva/{id}', [ReservaController::class, 'destroy'])->name('reservas.destroy');
-Route::post('/sys/hotelaria/reservas/{id}/cancelar', [ReservaController::class, 'cancelar'])->name('reservas.cancelar');
+    Route::post('/sys/hotelaria/reservas/{id}/cancelar', [ReservaController::class, 'cancelar'])->name('reservas.cancelar');
 
     Route::post('/sys/hotelaria/reservas/checkin/{id}', [ReservaController::class, 'checkin'])->name('reservas.checkin');
 
@@ -353,6 +356,12 @@ Route::post('/sys/hotelaria/reservas/{id}/cancelar', [ReservaController::class, 
     Route::put('/sys/hotelaria/hospedes/741/atualizar-hospede', [HospedeController::class, 'update'])->name('hospedes.update');
     Route::delete('/sys/hotelaria/hospedes/remover-hospede/{id}', [HospedeController::class, 'destroy'])->name('hospedes.destroy');
     Route::post('/sys/hotelaria/hospedes/{id}/checkout', [HospedeController::class, 'checkout'])->name('hospedes.checkout');
+
+
+
+    Route::get('/mapas-reservas', [MapaReservasController::class, 'index'])->name('mapas.reservas');
+
+
     // web.php
     Route::get('/hospedes/fatura/{id}', [HospedeController::class, 'verFatura'])->name('hospedes.fatura');
 
