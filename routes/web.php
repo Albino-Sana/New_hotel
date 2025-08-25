@@ -27,6 +27,7 @@ use App\Models\Reserva;
 use App\Models\Empresa;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\MapaReservasController;
+use App\Http\Controllers\SiteClienteController;
 
 
 use App\Models\Pagamento;
@@ -54,6 +55,8 @@ Route::middleware(['auth'])->group(function () {
 
     // 🔒 Rotas exclusivas para Admin
     Route::middleware('can:admin-only')->group(function () {
+        Route::get('/site', [SiteClienteController::class, 'index'])->name('site.index');
+
         Route::get('/saft', [SAFTController::class, 'form'])->name('saft.form');
         Route::post('/saft', [SAFTController::class, 'gerar'])->name('saft.gerar');
         Route::get('/saft/download/{filename}', [SAFTController::class, 'download'])->name('download.saft');
@@ -166,7 +169,14 @@ Route::middleware(['auth'])->group(function () {
 
 // 🔄 Rotas para gestão de reservas (Admin + Recepcionista)
 Route::middleware('can:gerenciar-reservas')->group(function () {
-
+    Route::get('/site', [SiteClienteController::class, 'index'])->name('site.index');
+    Route::get('/about', [SiteClienteController::class, 'about'])->name('about');
+    Route::get('/contact', [SiteClienteController::class, 'contact'])->name('contact');
+    Route::get('/menu', [SiteClienteController::class, 'menu'])->name('menu');
+    Route::get('/service', [SiteClienteController::class, 'service'])->name('service');
+    Route::get('/team', [SiteClienteController::class, 'team'])->name('team');
+    
+    Route::get('/testimonial', [SiteClienteController::class, 'testimonial'])->name('testimonial');
     Route::get('/contador-reservas', [PosController::class, 'contadorReservas'])->name('contador.reservas');
     Route::prefix('pos')->middleware(['auth'])->group(function () {
         Route::get('/sys/hotelaria/pos/789/index', [PosController::class, 'index'])->name('pos.index');
